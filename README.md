@@ -5,5 +5,9 @@ Nintendo please don't sue me😬
 
 Enjoy it while you can, probably lmao
 
-This one has more features than the dodo websites you see, I got it from this guy
+This one has more features than the dodo websites you see from other people, 
+
+I got the source from this guy
 https://augustberchelmann.com/mario/
+
+I changed it a bit
