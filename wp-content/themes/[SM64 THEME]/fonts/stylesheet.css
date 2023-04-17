@@ -4,8 +4,8 @@
 
 @font-face {
     font-family: 'super_mario_64_dsregular';
-    src: url('super-mario-64-ds.woff2') format('woff2'),
-         url('super-mario-64-ds.woff') format('woff');
+    src: url('@{plSM64Root}/fonts/super-mario-64-ds.woff2') format('woff2'),
+         url('@{plSM64Root}/fonts/super-mario-64-ds.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
