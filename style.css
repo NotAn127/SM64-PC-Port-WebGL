@@ -5,8 +5,48 @@
 @font-face {
     font-family: 'mario64regular';
     src: url('fonts/Mario64.ttf') format('truetype'),
-         src: url('fonts/Mario64.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 
+}
+
+body {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #1a2980; /* fallback for old browsers */
+  background: -webkit-linear-gradient(
+    to right,
+    #26d0ce,
+    #1a2980
+  ); /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(
+    to right,
+    #26d0ce,
+    #1a2980
+  ); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+h1 {
+  font-size: 6em;
+  font-family: "Mario64", sans-serif;
+  font-weight: bold;
+}
+
+h2 {
+  font-family: "Mario64", sans-serif;
+  font-size: 7em;
+}
+h1,
+h2 {
+  margin: 0;
+  color: #fff;
+}
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.2em;
+  max-width: 50%;
+  text-align: center;
+  color: #fff;
 }
