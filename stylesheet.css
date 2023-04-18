@@ -4,8 +4,8 @@
 
 @font-face {
     font-family: 'mario64regular';
-    src: url('wp-content/themes/[SM64Theme]/fonts/mario64-webfont.woff2') format('woff2'),
-         url('wp-content/themes/[SM64Theme]/fonts/mario64-webfont.woff') format('woff');
+    src('wp-content/themes/[SM64Theme]/fonts/mario64-webfont.woff2') format('woff2'),
+         src('wp-content/themes/[SM64Theme]/fonts/mario64-webfont.woff') format('woff');
     font-weight: normal;
     font-style: normal;
 
