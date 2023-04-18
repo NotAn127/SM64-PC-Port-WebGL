@@ -1,6 +1,6 @@
 # SM64 (PC Port) Web
 
-<img src="SuperMario64.png" alt="Alt text" title="Optional title" width="250" height="100">
+<img src="images/SuperMario64.png" alt="Alt text" title="Optional title" width="250" height="100">
 
 PC Port in the Web, this took a while to get, 
 Nintendo please don't sue me😬
