@@ -19,26 +19,29 @@ h1 {
 h2 {
   font-family: "Mario64", sans-serif;
     font-size: 1em;
+    color: #FFFF00;
 }
 
 li {
   font-family: "Mario64", sans-serif;
     font-size: 1m;
+    color: #FFFF00;
 }
 
 h2 {
   font-family: "Mario64", sans-serif;
     font-size: 13m;
+    color: #FFFF00;
 }
 
 h3 {
   font-family: "Mario64", sans-serif;
     font-size: 1m;
+    color: #FFFF00;
 }
 h1,
 h2 {
   margin: 0;
-  color: #FFFF00;
 }
 p {
   font-family: Arial, Helvetica, sans-serif;
