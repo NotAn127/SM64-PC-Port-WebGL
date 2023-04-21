@@ -20,6 +20,11 @@ div {
 
 Flying Mario {
 align-items: Right;
+float: left;
+margin-left: 0px 0px 0px 30px;
+width: 150px;
+height: 38px; 
+}
 
 body {
   background-image: url("https://raw.githubusercontent.com/CoolAn127Gamer/SM64-PC-Port-Web/gh-pages/images/bg.jpg");
