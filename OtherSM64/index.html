@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="title" content="Super Mario 64">
+    <meta name="description" content="Play your favorite online games free now!">
+    <meta name="language" content="English">
+    <title>EMS</title>
+    <link rel="icon" type="image/x-icon" href="https://ubg100.github.io/assets/img/socials/ubg100.png" />
+    <link rel="mask-icon" type="" href="https://ubg100.github.io/assets/img/socials/ubg100.png" color="#111" />
+    <link rel="stylesheet" href="https://ubg100.github.io//assets/css/main.css">
+    <link rel="stylesheet" href="https://ubg100.github.io/assets/css/contentpage.css">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous" />
+    <noscript>Your browser doesn't have JavaScript enabled. Please enable JavaScript or switch to a browser that
+        supports it.</noscript>
+</head>
+
+ 
+<body>
+    <div class="content-wrapper" align="cecnter">
+        <div class="main-content">
+            <section class="content">
+                <div class="content-container">
+                    <canvas class="emscripten" id="canvas" style="width: 900px; height: 506.25px"></canvas>
+                    <script type='text/javascript'>
+                        var Module = {
+                            preRun: [],
+                            postRun: [],
+                            print: (function() {
+                                return function(text) {
+                                    if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+                                    console.log(text);
+                                };
+                            })(),
+                            printErr: function(text) {
+                                if (arguments.length > 1)
+                                    text = Array.prototype.slice.call(arguments).join(' ');
+                                console.error(text);
+                            },
+                            canvas: (function() {
+                                var canvas = document.getElementById('canvas');
+                                canvas.width = window.innerWidth;
+                                canvas.height = window.innerHeight;
+                                canvas.addEventListener("webglcontextlost", function(e) {
+                                    alert('WebGL context lost. You will need to reload the page.');
+                                    e.preventDefault();
+                                }, false);
+                                return canvas;
+                            })(),
+                            setStatus: function(text) {}
+                        };
+                    </script>
+                    <script async type="text/javascript" src="https://ubg100.github.io/games/sm64/sm64.us.f3dex2e.js"></script>
+                    <div class="bar">
+                        <div class="bar-left">
+                            <h1 id="content-title">Super Mario ^4</h1>
+                            <h3 id="content-creator">by Sm64js</h3>
+                        </div>
+                        <button onclick="cFullscreen()">
+                            <i class="fas fa-expand fa-2x"></i>
+                        </button>
+                    </div>
+                </div>
+ 
+ 
+                
+    </div>
+    
+    <script src="https://ubg100.github.io//assets/js/main.js"></script>
+    <script src="https://ubg100.github.io//assets/js/games/games.js"></script>
+    <script src="https://ubg100.github.io//assets/js/contentpage.js"></script>
+    <script src="https://ubg100.github.io//assets/js/gads/gads.js"></script>
+</body>
+ 
+</html>
