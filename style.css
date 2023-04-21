@@ -10,11 +10,12 @@
 }
 
 div {
-    width: 1000px;
+    width: 2000px;
     background: linear-gradient(to bottom, #000000 0%, #990033 100%);
 }
 
 body {
+  background-image: url("https://i.ibb.co/chx1fnR/SM64-Skybox1.png");
   display: flex;
   align-items: center;
   justify-content: center;
