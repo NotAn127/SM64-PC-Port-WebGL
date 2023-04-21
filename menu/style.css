@@ -18,6 +18,9 @@ div {
   background: linear-gradient(to bottom, #000000 0%, #990033 100%);
 }
 
+Flying Mario {
+align-items: Right;
+
 body {
   background-image: url("https://raw.githubusercontent.com/CoolAn127Gamer/SM64-PC-Port-Web/gh-pages/images/bg.jpg");
   display: flex;
