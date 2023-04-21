@@ -9,8 +9,11 @@
   font-weight: normal;
 }
 
+div {
+    background: linear-gradient(to bottom, #000000 0%, #990033 100%);
+}
+
 body {
-  background: linear-gradient(to bottom, #000000 0%, #990033 100%);
   display: flex;
   align-items: center;
   justify-content: center;
