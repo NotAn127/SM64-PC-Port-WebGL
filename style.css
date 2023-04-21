@@ -10,9 +10,10 @@
 }
 
 div {
+  align-items: center;
   border-radius: 25px;
   height: 300px;
-  width: 1200px;
+  width: 1000px;
   background: linear-gradient(to bottom, #000000 0%, #990033 100%);
 }
 
