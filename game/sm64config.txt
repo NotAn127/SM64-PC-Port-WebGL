@@ -12,3 +12,5 @@ key_stickup 17
 key_stickdown 31
 key_stickleft 30
 key_stickright 32
+precache true
+skip intro false
