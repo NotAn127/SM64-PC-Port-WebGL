@@ -15,3 +15,7 @@ I got the source from this guy
 https://augustberchelmann.com/mario/
 
 I changed it a bit
+
+<img src="screenshots/1.png" alt="Alt text" title="Optional title" width="250" height="100">
+<img src="screenshots/2.png" alt="Alt text" title="Optional title" width="250" height="100">
+<img src="screenshots/3.png" alt="Alt text" title="Optional title" width="250" height="100">
