@@ -10,8 +10,8 @@
 }
 
 div {
-  height: 1000px;
-  width: 1200px;
+  height: 400px;
+  width: 1300px;
   background: linear-gradient(to bottom, #000000 0%, #990033 100%);
 }
 
@@ -25,6 +25,7 @@ body {
 }
 h1 {
   font-family: "Mario64DS", sans-serif;
+    align-items: center;
     font-size: 1m;
     color: #FFA500;
     font-style: bold;
