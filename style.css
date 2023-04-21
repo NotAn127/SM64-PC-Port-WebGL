@@ -10,8 +10,9 @@
 }
 
 div {
+  border-radius: 25px;
   height: 300px;
-  width: 1300px;
+  width: 1200px;
   background: linear-gradient(to bottom, #000000 0%, #990033 100%);
 }
 
