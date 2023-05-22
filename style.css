@@ -1,11 +1,11 @@
 @font-face {
   font-family: "Mario64";
-  src: url(../fonts/Mario64.ttf) format("truetype");
+  src: url(/fonts/Mario64.ttf) format("truetype");
 }
 
 @font-face {
   font-family: "Mario64DS";
-  src: url(../fonts/Super-Mario-64-DS.ttf) format("truetype");
+  src: url(/fonts/Super-Mario-64-DS.ttf) format("truetype");
   font-weight: normal;
 }
 
