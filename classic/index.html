@@ -63,39 +63,47 @@
       </div>
     </div>
     <div id="container">
-      <canvas class="emscripten" id="canvas"></canvas>
-    </div>
-    <script type='text/javascript'>
-      var Module = {
-        preRun: [],
-        postRun: [],
-        print: (function() {
-          return function(text) {
-            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-            console.log(text);
-          };
-        })(),
-        printErr: function(text) {
-          if (arguments.length > 1)
-            text = Array.prototype.slice.call(arguments).join(' ');
-          console.error(text);
-        },
-        canvas: (function() {
-          var canvas = document.getElementById('canvas');
-          canvas.width = window.innerWidth; // Todo: how to do this from c++
-          canvas.height = window.innerHeight;
-          canvas.addEventListener("webglcontextlost", function(e) {
-            alert('WebGL context lost. You will need to reload the page.');
-            e.preventDefault();
-          }, false);
-          return canvas;
-        })(),
-        setStatus: function(text) {
-        }
-      };
-    </script>
-    <script async type="text/javascript" src="../game/ClassicVanilla/sm64.js"></script>
-    <script>
-    </script>
-  </body>
-</html>
+document.write( '      <canvas class=\"emscripten\" id=\"canvas\" width=\"1920\" height=\"1080\" style=\"cursor: default;\"></canvas>\n' );
+document.write( '    </div>\n' );
+document.write( '    <script type=\"text/javascript\">\n' );
+document.write( '      var Module = {\n' );
+document.write( '        preRun: [],\n' );
+document.write( '        postRun: [],\n' );
+document.write( '        print: (function() {\n' );
+document.write( '          return function(text) {\n' );
+document.write( '            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(\' \');\n' );
+document.write( '            console.log(text);\n' );
+document.write( '          };\n' );
+document.write( '        })(),\n' );
+document.write( '        printErr: function(text) {\n' );
+document.write( '          if (arguments.length > 1)\n' );
+document.write( '            text = Array.prototype.slice.call(arguments).join(\' \');\n' );
+document.write( '          console.error(text);\n' );
+document.write( '        },\n' );
+document.write( '        canvas: (function() {\n' );
+document.write( '          var canvas = document.getElementById(\'canvas\');\n' );
+document.write( '          canvas.width = window.innerWidth; // Todo: how to do this from c++\n' );
+document.write( '          canvas.height = window.innerHeight;\n' );
+document.write( '          canvas.addEventListener(\"webglcontextlost\", function(e) {\n' );
+document.write( '            alert(\'WebGL context lost. You will need to reload the page.\');\n' );
+document.write( '            e.preventDefault();\n' );
+document.write( '          }, false);\n' );
+document.write( '          return canvas;\n' );
+document.write( '        })(),\n' );
+document.write( '        setStatus: function(text) {\n' );
+document.write( '        }\n' );
+document.write( '      };\n' );
+document.write( '    </script>\n' );
+document.write( '    <script async=\"\" type=\"text/javascript\" src=\"../game/ClassicVanilla/sm64.js\"></script>\n' );
+document.write( '    <script>\n' );
+document.write( '    </script>\n' );
+document.write( '  \n' );
+document.write( '\n' );
+document.write( '\n' );
+document.write( '\n' );
+document.write( '\n' );
+document.write( '</body></html>' );
+
+//-->
+  })
+</script>
