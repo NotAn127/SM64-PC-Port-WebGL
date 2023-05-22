@@ -28,37 +28,37 @@ body {
 h1 {
   font-family: "Mario64DS", sans-serif;
     align-items: center;
-    font-size: 2m;
+    font-size: 5m;
     color: #09ff00;
     font-style: bold;
 }
 
 h2 {
   font-family: "Mario64", sans-serif;
-    font-size: 2em;
+    font-size: 5em;
     color: #00aeff;
 }
 
 li {
   font-family: "Mario64", sans-serif;
-    font-size: 2m;
+    font-size: 5m;
     color: #00d0ff;
 }
 
 h2 {
   font-family: "Mario64", sans-serif;
-    font-size: 2m;
+    font-size: 5m;
     color: #007bff;
 }
 
 h3 {
   font-family: "Mario64", sans-serif;
-    font-size: 2m;
+    font-size: 5m;
     color: #00bfff;
 }
 h4 {
   font-family: "Mario64", sans-serif;
-    font-size: 2m;
+    font-size: 5m;
     color: #00e5ff;
 }
 h1,
