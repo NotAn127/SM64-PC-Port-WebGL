@@ -1,1 +1,0 @@
-echo "Installing Packages..." && sudo apt install -y git python2 && echo "Downloading SM64-JS" && git clone https://github.com/CoolAn127Gamer/SM64-PC-Port-Web.git && cd SM64-PC-Port-Web-gh-pages && echo "Game is up at http://localhost:6464" && python2 -m SimpleHTTPServer 6464
