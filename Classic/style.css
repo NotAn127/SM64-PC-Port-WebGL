@@ -1,0 +1,73 @@
+@font-face {
+  font-family: "Mario64";
+  src: url(fonts/Mario64.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Mario64DS";
+  src: url(fonts/Super-Mario-64-DS.ttf) format("truetype");
+  font-weight: normal;
+}
+
+div {
+  align-items: center;
+  text-align: center;
+  border-radius: 25px;
+  height: 300px;
+  width: 1000px;
+  background: linear-gradient(to bottom, #000000 0%, #990033 100%);
+}
+
+body {
+  background-image: url("https://i.ibb.co/chx1fnR/SM64-Skybox1.png");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+h1 {
+  font-family: "Mario64DS", sans-serif;
+    align-items: center;
+    font-size: 1m;
+    color: #FFA500;
+    font-style: bold;
+}
+
+h2 {
+  font-family: "Mario64", sans-serif;
+    font-size: 1em;
+    color: #FFFF00;
+}
+
+li {
+  font-family: "Mario64", sans-serif;
+    font-size: 1m;
+    color: #FFFF00;
+}
+
+h2 {
+  font-family: "Mario64", sans-serif;
+    font-size: 1m;
+    color: #FFFF00;
+}
+
+h3 {
+  font-family: "Mario64", sans-serif;
+    font-size: 1m;
+    color: #FFA500;
+}
+h4 {
+  font-family: "Mario64", sans-serif;
+    font-size: 1m;
+    color: #FFFF00;
+}
+h1,
+h2 {
+  margin: 0;
+}
+p {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  text-align: center;
+  color: #FFFF00;
+}
