@@ -16,6 +16,7 @@ https://augustberchelmann.com/mario/
 
 I changed it a bit
 
-<img src="screenshots/1.png" alt="Alt text" title="Optional title">
-<img src="screenshots/2.png" alt="Alt text" title="Optional title">
-<img src="screenshots/3.png" alt="Alt text" title="Optional title">
+<img src="screenshots/1.png" alt="Alt text" title="Menu">
+<img src="screenshots/2.png" alt="Alt text" title="OtherMenu">
+<img src="screenshots/3.png" alt="Alt text" title="Gameplay">
+<img src="screenshots/4.png" alt="Alt text" title="OptionsPcPort">
