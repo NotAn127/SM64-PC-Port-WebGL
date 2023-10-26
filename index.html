@@ -1,102 +1,469 @@
+﻿<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>sm64js</title>
 
-<!doctype html>
-<html lang="en-us">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Super Mario 64 PC Web! 🎩</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" type="x-icon" href="images/favicon.ico">
-<img src="images/SuperMario64.png"<alt="Super Mario 64" width="250" height="100"> </center>
-    <style>
-      body, html{
-        margin: 0;
-        padding: 0;
-        scrollbar-width: none;
-      }
-      ::-webkit-scrollbar {
-        display: none;
-      }
-      #container {
-        width: 100vw;
-        height: 100vh;
-        display: flex;
-        align-items:center;
-        justify-content: center;
-      }
-      canvas {
-        width: 100vw;
-        height: 100vh;
-      }
-      #controls {
-        display: flex;
-        align-items: right;
-      }
-      #controller, #dmca {
-        padding-left: 4em;
-      }
-    </style>
-  </head>
-  <body>
-    <div id="controls">
-      <div id="keyboard">
-          <h1>Welcome</h1>
-        <h3>Keyboard Controls (These Can be changed in game)</h3>
-          <li>Movement: WASD</li>
-          <li>A: L</li>
-          <li>B: ,</li>
-          <li>L: .</li>
-          <li>R: Shift</li>
-          <li>Z: K</li>
-          <li>Start: Space</li>
-          <li>C-stick: Arrow Keys</li>
-          <h1>      </h1>
-        </ul>
-      </div>
-      <div id="controller">
-        <h3>You can use a controller!</h>
-        <h4>You can save!</h4>
- <h4><a href="https://coolan127gamer.github.io/SM64-PC-Port-Web/classic/" target="_blank">Click Here to Play Classic</a></h3>
-        <h4>Scroll down to hide these instructions and to start playing the game.</h4>
-        <h4>Make sure to remember these keybinds.</h3>
-        <h3>___________________________________________________________</h4>
-        <h4>Press Alt + ↑ to see instrctions again</h3>
-      </div>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+
+</head>
+
+<body class="text-center">
+    <canvas hidden id="fullCanvas" width="640" height="480" style="cursor:none; padding-bottom: 20px"></canvas>
+
+    <div class="cover-container d-flex h-100 mx-auto flex-column">
+        <header class="masthead">
+            <div class="inner">
+                <h3 class="masthead-brand rainbowText">Super Mario 64 JS</h3>
+                <nav class="nav nav-masthead justify-content-center">
+                    <a class="nav-link" href="https://sm64js.com">MMO</a>
+                    <a class="nav-link" href="https://60fps.sm64js.com">60 FPS</a>
+                    <a class="nav-link" href="#What">About</a>
+                    <a class="nav-link" href="https://github.com/sm64js/sm64js">Source Code</a>
+                    <a class="nav-link" href="https://discord.gg/7UaDnJt">Discord Server</a>
+                    <a class="nav-link" href="#Contact">Contact</a>
+                </nav>
+            </div>
+        </header>
+
+        <main role="main" class="inner cover" hidden id="mainContent">
+            <h1 class="cover-heading rainbowText">Super Mario 64 - Javascript Port</h1>
+            <h6 style="color:red">This project is currently still being developed. This page may be live from time to time for testing, but there may be glitches and performance issues. The server will go down and restart at random times without warning. If you would like to help with the project or have feedback please contact me.</h6>
+            <div id="rom" hidden>
+                <form id="romSelect" class="form-group">
+                    <h4 style="color:#fa3e3e">Select US sm64 (z64) ROM File from your computer</h4>
+                    <input id="romFile" class="btn btn-secondary btn-sm" type="file">
+                    <input class="btn btn-primary btn-sm" type="submit">
+                </form>
+                <h6 id="romMessage">This project uses the textures and other game assets from the original game. Due to copyright issues, I cannot host those assets on this site. Please select a sm64 ROM to extract those assets before you can play.</h6>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row" style="padding-top: 50px">
+                    <div class="col-2"></div>
+                    <div class="col-4">
+                        <select id="mapSelect" class="form-control" style="width: 220px">
+                            <option value="16">Castle Grounds</option>
+                            <option value="6" >Castle</option>
+                            <option value="26">Castle Courtyard</option>
+                            <option value="9" >Bob-omb Battlefield</option>
+                            <option value="24">Whomp's Fortress</option>
+                            <option value="27">Princess's Secret Slide</option>
+                            <option value="12">Jolly Roger Bay</option>
+                            <option value="5" >Cool, Cool Mountain</option>
+                            <option value="4" >Big Boo's Haunt</option>
+                            <option value="7" >Hazy Maze Cave</option>
+                            <option value="22">Lethal Lava Land</option>
+                            <option value="8" >Shifting Sand Land</option>
+                            <!-- <option value="23">Dire, Dire Docks</option> -->
+                            <option value="10">Snowman's Land</option>
+                            <option value="11">Wet-Dry World</option>
+                            <option value="36">Tall, Tall Mountain</option>
+                            <option value="13">Tiny-Huge Island</option>
+                            <option value="20">Secret Aquarium</option>
+                            <!-- <option value="29">Tower of the Wing Cap</option> -->
+                            <option value="17">Bowser in the Dark World</option>
+                            <option value="19">Bowser in the Fire Sea</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <button id="startbutton" type="button" class="btn btn-success" style="width: 220px" enabled>Start Game</button>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </div>
+
+            <canvas id="gameCanvas" width="640" height="480" style="cursor:none; padding: 30px 0 5px 0"></canvas>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-2"></div>
+                    <div class="col-4" style="text-align:left">
+                        <h6>Frame time: <span id="timing-total"></span></h6>
+                        <h6 hidden>Game Logic (Avg): </h6>
+                        <h6 hidden>Rendering/WebGL (Avg):</h6>
+                    </div>
+                    <div class="col-4" style="text-align:right">
+                        <h6 id="maxFps"></h6>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+                <div hidden class="row" style="justify-content:center;">
+                    <h6 style="padding-right:10px"> Adjust Game Speed: </h6>
+                    <input id="slider" type="range" style="width:300px" min="1" max="60" value="30">
+                    <h6 id="fps" style="padding-left:10px"> 30 fps </h6>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row" style="justify-content:center; padding-top: 20px">
+                    <div class="col-2"></div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                data-html="true"
+                                data-container="body"
+                                data-toggle="keyboardControlsToggle"
+                                data-placement="bottom">
+                            Keyboard
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                data-html="true"
+                                data-container="body"
+                                data-toggle="gamepadControlsToggle"
+                                data-placement="bottom">
+                            Gamepad
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="window.enterFullScreenMode()">
+                            Full Screen
+                        </button>
+                    </div>
+                    <div class="col-2">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="window.fullWindowMode = true">
+                            Full Window
+                        </button>
+                    </div>
+                    <div class="col-2"></div>
+                </div>
+            </div>
+
+            <div class="container-fluid">
+                <div class="row" style="justify-content:center; padding-top: 10px">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="location.href='https://github.com/sm64js/sm64js/issues'">
+                            Submit Bug
+                        </button>
+
+                        <!-- <a href="https://github.com/sm64js/sm64js/issues" style="margin-right:30px" type="button" class="btn btn-warning">Submit Bug</a> -->
+                    </div>
+                    <div class="col-3">
+                        <button type="button"
+                                class="btn btn-sm btn-primary"
+                                onclick="window.snapshotLocation()">
+                            Save Position
+                        </button>
+                    </div>
+                    <div class="col-3"></div>
+                </div>
+            </div>
+
+            <br>
+            <br>
+            <br>
+
+            <a name="What"></a>
+            <h4>What is this?</h4>
+            <p>
+                This is an ongoing work-in-progress port of the <a href="https://github.com/n64decomp/sm64">decompilation</a> of original Nintendo game, Super Mario 64, to native JavaScript (No Emulation) (No Web Assembly).
+                This project required creating a JavaScript WebGL port of <a href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a> originally implemented with OpenGL in C. This project also includes the development of online mass multiplayer versions of sm64js and other custom multiplayer game modes.
+            </p>
+            <br />
+
+            <a name="Purpose"></a>
+            <h4>What is the purpose of this port?</h4>
+            <ul style="display:inline-block;vertical-align:middle;text-align:left">
+                <li>
+                    <b>Extensibility:</b> More access to more developers to add custom content
+                    <ul style="padding-left:40px">
+                        <li>Rapid Prototyping</li>
+                        <li>More friendly to importing other software modules/packages</li>
+                        <li>More friendly to prototyping multiplayer custom games/mods</li>
+                    </ul>
+                </li>
+                <li><b>Portablity:</b> Sm64 projects can run on any device with a web browser anywhere without needing to download or install anything</li>
+                <li>Opportunity to refactor / rewrite with modern coding style and cleanup</li>
+            </ul>
+            <br />
+            <br />
+
+            <a name="WASM"></a>
+            <h4>What's wrong with Web Assembly / Emscripten</h4>
+            <p>Nothing. However, I believe access to this game's source code in a higher level programming language opens it up to a wider pool of potentially capable developers / modders. And seems to me like a natural next step following in the amazing work done by the decomp team and pc port.</p>
+            <br />
+
+            <a name="Credits"></a>
+            <h4>Credits</h4>
+            <br />
+
+
+            <div class="row" style="justify-content:center;">
+                <h5>
+                    <a style="font-weight:bold !important;" href="https://github.com/sm64js/sm64js/graphs/contributors">Developers / Contributors</a>
+                </h5>
+
+            </div>
+            <div class="row" style="justify-content:center;">
+                <p>
+                    <a style="color:#fdffd4" href="https://sm64js.com">Snuffy</a>,
+                    <a style="color:#fdffd4" href="https://github.com/ScottDikowitz">ScottDikowitz</a>,
+                    <a style="color:#fdffd4" href="https://luphoria.github.io/">luphoria</a>,
+                    <a style="color:#fdffd4" href="https://github.com/djoslin0">djoslin0</a>,
+                    <a style="color:#fdffd4" href="https://github.com/J4ckr07">J4ckr07</a>,
+                    <a style="color:#fdffd4" href="https://github.com/agent-11">Agent 11</a>,
+                    <a style="color:#fdffd4" href="https://github.com/joe07734">joe07734</a>,
+                    <a style="color: #fdffd4" href="https://github.com/AlbertoCentonze">Alberto</a>,
+                    <a style="color: #fdffd4" href="https://github.com/abnormalhare">CreateSource</a>
+                </p>
+            </div>
+            <br />
+
+
+            <div class="row">
+                <div class="col-6">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/n64decomp/sm64">Super Mario 64 Decomp</a></h6>
+                    <p>Team that decompiled the original Super Mario 64 ROMs into C source code</p>
+                </div>
+                <div class="col-6">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/sm64-port/sm64-port">Super Mario 64 PC Port</a></h6>
+                    <p>Team that ported the decompiled project to PC</p>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/Emill/n64-fast3d-engine">N64 Fast 3D Renderer</a></h6>
+                    <p class="mb-0">
+                        OpenGL Implementation of a 3D renderer for the Nintendo 64's graphics
+                    </p>
+                    <small>   (I had to reimplement this in JavaScript and WebGL)   </small>
+                </div>
+            </div>
+
+            <br />
+
+            <div class="row">
+
+                <div class="col">
+                    <h6><a style="font-weight:bold !important" href="https://github.com/djoslin0/sm64ex-coop">Super Mario 64 Coop</a></h6>
+                    <p class="mb-0">
+                        Online cooperative multiplayer mod for SM64, aiming to synchronize all entities and every level for two players.
+
+                    </p>
+                    <small>
+                        (Special thanks to <a href="https://github.com/djoslin0">djoslin0</a>, the developer of this project, for consultation and advice on the implementation of multiplayer for sm64js. I also ported some  code from this project directly)
+                    </small>
+                </div>
+            </div>
+
+
+
+            <br />
+            <div class="row" style="justify-content:center;">
+                <h6>Other Libraries</h6>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <p>
+                    <a style="color:#fdffd4" href="https://github.com/geckosio/geckos.io">Geckos.io</a>,
+                    <a style="color:#fdffd4" href="https://jeremyckahn.github.io/keydrown/">Keydrown</a>,
+                </p>
+            </div>
+
+            <div class="row" style="justify-content:center;">
+                <h6>Special Thanks to</h6>
+            </div>
+            <div class="row" style="justify-content:center;">
+                <p>
+                    <a style="color:#fdffd4" href="https://github.com/Tarnadas">Tarnadas</a>,
+                    <a style="color:#fdffd4" href="https://github.com/yandeu">Yannick</a>,
+                    <a style="color:#fdffd4" href="https://github.com/josegonzalez">Jose Diaz-Gonzalez</a>,
+                    <a style="color:#fdffd4" href="https://github.com/Emill">Emill</a>,
+                </p>
+            </div>
+
+
+            <a name="Contact"></a>
+            <h4>Contact</h4>
+            <p>
+                Questions? Suggestions? Want to help with this project? =)
+                <br />
+                I have a discord server dedicated to sm64js: <a href="https://discord.gg/7UaDnJt"> Join Here </a>
+                <br />
+                Discord: snuffysasa#2779
+            </p>
+            <br />
+
+        </main>
+
     </div>
-    <div id="container">
-      <canvas class="emscripten" id="canvas"></canvas>
+
+
+
+    <div hidden>
+        <div class="container" id="keyboardControlsWindow">
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
+                        <select class="form-control" keyboardButton name="start" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
+                        <select class="form-control" keyboardButton name="a" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
+                        <select class="form-control" keyboardButton name="b" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
+                        <select class="form-control" keyboardButton name="z" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">R:</label>
+                        <select class="form-control" keyboardButton name="rt" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Up:</label>
+                        <select class="form-control" keyboardButton name="up" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:40px">Down:</label>
+                        <select class="form-control" keyboardButton name="down" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group ">
+                        <!-- mx-sm-3 mb-2 -->
+                        <label class="col-sm-2 col-form-label" style="padding-right:20px">Left:</label>
+                        <select class="form-control" keyboardButton name="left" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Right:</label>
+                        <select class="form-control" keyboardButton name="right" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Up:</label>
+                        <select class="form-control" keyboardButton name="cu" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:40px">C-Down:</label>
+                        <select class="form-control" keyboardButton name="cd" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group ">
+                        <!-- mx-sm-3 mb-2 -->
+                        <label class="col-sm-2 col-form-label" style="padding-right:20px">C-Left:</label>
+                        <select class="form-control" keyboardButton name="cl" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-Right:</label>
+                        <select class="form-control" keyboardButton name="cr" onchange="window.updateKeyboardMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+
+            <div class="row" style="justify-content:center;">
+                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
+        </div>
+
+        <div class="container" id="gamepadControlsWindow">
+            <div class="row" style="justify-content:center">
+                <h6 style="text-align:center" id="noGamepadMessage">No Gamepad Detected Yet</h6>
+                <div hidden id="gamepadMessageDiv">
+                    <h6 id="gamepadMessage">
+                    </h6>
+                    <h6 style="text-align:center" id="gamepadMessage">
+                        Is your gamepad not working correctly?
+                        <br />
+                        Contact me so I can support more gamepads. Discord: snuffysasa#2779 /
+                        <a href="https://github.com/sm64js/sm64js/issues" style="color:blue;font-weight:bold">Github</a>
+                    </h6>
+                </div>
+
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Start:</label>
+                        <select class="form-control" gamepadButton name="start" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">A:</label>
+                        <select class="form-control" gamepadButton name="a" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">B:</label>
+                        <select class="form-control" gamepadButton name="b" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">Z:</label>
+                        <select class="form-control" gamepadButton name="z" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">R:</label>
+                        <select class="form-control" gamepadButton name="rt" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row">
+                <form class="form-inline">
+
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">axisX:</label>
+                        <select class="form-control" gamepadAxes name="stickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">axisY:</label>
+                        <select class="form-control" gamepadAxes name="stickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-axisX:</label>
+                        <select class="form-control" gamepadAxes name="cStickX" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:30px">C-axisY:</label>
+                        <select class="form-control" gamepadAxes name="cStickY" onchange="window.updateGamepadMapping(this.value, this.name)"></select>
+                    </div>
+
+                    <div class="form-group mx-sm-3 mb-2">
+                        <label class="col-sm-2 col-form-label" style="padding-right:50px">deadZone:</label>
+                        <input type="number" style="width:70px;" value="0.3" min="0" max="1" step="0.01" class="form-control" onchange="window.updateDeadZone(this.value)">
+                    </div>
+
+                <!--                <div class="mx-sm-3 mb-2">
+                                <button class="btn btn-sm btn-secondary" onclick="window.switchGamepadFunc()">
+                                    Multiple Gamepads?
+                                </button>
+                            </div>-->
+            </div>
+
+            <div class="row" style="justify-content:center;">
+                <button class="btn btn-sm btn-success" style="margin-right:30px" onclick="window.saveControls()">Save Controls</button>
+                <button class="btn btn-sm btn-secondary" onclick="window.loadDefaultControls()">Load Default Controls</button>
+            </div>
+        </div>
+
+
     </div>
-    <script type='text/javascript'>
-      var Module = {
-        preRun: [],
-        postRun: [],
-        print: (function() {
-          return function(text) {
-            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-            console.log(text);
-          };
-        })(),
-        printErr: function(text) {
-          if (arguments.length > 1)
-            text = Array.prototype.slice.call(arguments).join(' ');
-          console.error(text);
-        },
-        canvas: (function() {
-          var canvas = document.getElementById('canvas');
-          canvas.width = window.innerWidth; // Todo: how to do this from c++
-          canvas.height = window.innerHeight;
-          canvas.addEventListener("webglcontextlost", function(e) {
-            alert('WebGL context lost. You will need to reload the page.');
-            e.preventDefault();
-          }, false);
-          return canvas;
-        })(),
-        setStatus: function(text) {
-        }
-      };
-    </script>
-    <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
-    <script>
-    </script>
-  </body>
+
+</body>
 </html>
