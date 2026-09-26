@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Super Mario 64 PC Web! 🎩</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+      body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #000000;
+        font-family: 'Press Start 2P', monospace;
+        color: #ffffff;
+        overflow-x: hidden;
+      }
+      ::-webkit-scrollbar {
+        display: none;
+      }
+      header {
+        text-align: center;
+        padding: 20px 0;
+        background: linear-gradient(to bottom, #b20000, #7f0000);
+        border-bottom: 4px solid #ffcc00;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.8);
+      }
+      header img {
+        width: 280px;
+        height: auto;
+        image-rendering: pixelated;
+      }
+      #instructions-panel {
+        max-width: 850px;
+        margin: 20px auto;
+        background: rgba(20, 20, 20, 0.95);
+        border: 4px solid #ffcc00;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.9);
+      }
+      #instructions-panel h1 {
+        font-size: 14px;
+        color: #ffcc00;
+        text-transform: uppercase;
+        margin-top: 0;
+        border-bottom: 2px dashed #ffcc00;
+        padding-bottom: 8px;
+      }
+      .controls-grid {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        font-size: 10px;
+        line-height: 1.8;
+      }
+      .controls-column {
+        flex: 1;
+      }
+      .controls-column ul {
+        padding-left: 15px;
+        margin: 5px 0;
+      }
+      .notice-bar {
+        text-align: center;
+        margin-top: 15px;
+        font-size: 9px;
+        color: #00ffcc;
+      }
+      .notice-bar a {
+        color: #ffcc00;
+        text-decoration: underline;
+      }
+      #container {
+        width: 100vw;
+        height: calc(100vh - 160px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+      }
+      canvas.emscripten {
+        border: 4px solid #333;
+        background-color: black;
+        width: 960px;
+        height: 540px;
+        max-width: 100%;
+        max-height: 100%;
+        box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <center><img src="images/SuperMario64.png" alt="Super Mario 64"></center>
+    </header>
+    
+    <div id="instructions-panel">
+      <h1>Controls & Information[span_0](start_span)[span_0](end_span)</h1>
+      <div class="controls-grid">
+        <div class="controls-column">
+          <p><strong>Keyboard Mapping:</strong></p>
+          <ul>
+            <li>Movement: WASD[span_1](start_span)[span_1](end_span)</li>
+            <li>A Button: L[span_2](start_span)[span_2](end_span)</li>
+            <li>B Button: ,[span_3](start_span)[span_3](end_span)</li>
+            <li>L Trigger: .[span_4](start_span)[span_4](end_span)</li>
+            <li>R Trigger: Shift[span_5](start_span)[span_5](end_span)</li>
+            <li>Z Trigger: K[span_6](start_span)[span_6](end_span)</li>
+            <li>Start: Space[span_7](start_span)[span_7](end_span)</li>
+            <li>C-Stick: Arrow Keys[span_8](start_span)[span_8](end_span)</li>
+          </ul>
+        </div>
+        <div class="controls-column">
+          <p><strong>System Notes:</strong></p>
+          <ul>
+            <li>Gamepad controllers are fully supported[span_9](start_span)[span_9](end_span).</li>
+            <li>Game progress auto-saves locally[span_10](start_span)[span_10](end_span).</li>
+          </ul>
+          <div class="notice-bar">
+            <a href="https://notan127.github.io/SM64-PC-Port-WebGL/classic/" target="_blank">Click Here to Play Classic Mode</a>[span_11](start_span)[span_11](end_span)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="container">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+
+    <script type='text/javascript'>
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: (function() {
+          return function(text) {
+            if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+            console.log(text);
+          };
+        })(),
+        printErr: function(text) {
+          if (arguments.length > 1)
+            text = Array.prototype.slice.call(arguments).join(' ');
+          console.error(text);
+        },
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+          canvas.width = 1280;
+          canvas.height = 720;
+          canvas.addEventListener("webglcontextlost", function(e) {
+            alert('WebGL context lost. You will need to reload the page.');
+            e.preventDefault();
+          }, false);
+          return canvas;
+        })(),
+        setStatus: function(text) {}
+      };
+    </script>
+    <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
+  </body>
+</html>
