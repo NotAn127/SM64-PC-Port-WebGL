@@ -60,8 +60,7 @@ canvas.emscripten {
   transition: opacity 0.2s ease;
 }
 
-#toolbar:hover,
-#toolbar:focus-within {
+#toolbar:hover {
   opacity: 1;
 }
 
