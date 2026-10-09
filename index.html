@@ -142,88 +142,72 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
       }
 
-      // Upgraded Save Data Management
-      function getFS() {
-        if (typeof FS !== 'undefined') return FS;
-        if (typeof Module !== 'undefined' && Module.FS) return Module.FS;
-        return null;
-      }
-
-      var commonSavePaths = [
-        '/sm64_save_file.bin',
-        '/home/web_user/sm64_save_file.bin',
-        '/offline/sm64_save_file.bin',
-        '/data/sm64_save_file.bin'
-      ];
-
       function exportSave() {
-        var fileSystem = getFS();
-        if (!fileSystem) {
-          alert("The game has not fully loaded yet or the file system is inaccessible.");
+        var encodedSave;
+        try {
+          encodedSave = localStorage.getItem('sm64_save_file');
+        } catch (err) {
+          alert("Unable to access the browser's save storage: " + err.message);
           return;
         }
 
-        var saveFound = false;
-
-        for (var i = 0; i < commonSavePaths.length; i++) {
-          try {
-            var saveArray = fileSystem.readFile(commonSavePaths[i]);
-            var blob = new Blob([saveArray], { type: 'application/octet-stream' });
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'sm64_save_file.bin';
-            link.click();
-            
-            localStorage.setItem('sm64_save_path', commonSavePaths[i]);
-            saveFound = true;
-            break; 
-          } catch (err) {
-            // Continues through array list paths
-          }
+        if (!encodedSave) {
+          alert("No save data is stored yet. Play until the game saves, then try again.");
+          return;
         }
 
-        if (!saveFound) {
-          alert("Save file not found! You must collect at least one Star in the game before it generates a save file to backup.");
+        var binary;
+        try {
+          binary = atob(encodedSave);
+        } catch (err) {
+          alert("The stored save data is invalid and cannot be backed up.");
+          return;
         }
+        if (binary.length !== 512) {
+          alert("The stored save data is invalid and cannot be backed up.");
+          return;
+        }
+
+        var saveArray = new Uint8Array(binary.length);
+        for (var i = 0; i < binary.length; i++) {
+          saveArray[i] = binary.charCodeAt(i);
+        }
+        var blob = new Blob([saveArray], { type: 'application/octet-stream' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'sm64_save_file.bin';
+        link.click();
       }
 
       function importSave(event) {
         var file = event.target.files[0];
         if (!file) return;
 
-        var fileSystem = getFS();
-        if (!fileSystem) {
-          alert("The game has not fully loaded yet.");
-          return;
-        }
-
         var reader = new FileReader();
         reader.onload = function(e) {
           var data = new Uint8Array(e.target.result);
-          var knownPath = localStorage.getItem('sm64_save_path');
-          
+          if (data.length !== 512) {
+            alert("Invalid save file. A Super Mario 64 save file must be exactly 512 bytes.");
+            return;
+          }
+
+          var binary = '';
+          for (var i = 0; i < data.length; i++) {
+            binary += String.fromCharCode(data[i]);
+          }
+
           try {
-            if (knownPath) {
-              fileSystem.writeFile(knownPath, data);
-            } else {
-              for (var i = 0; i < commonSavePaths.length; i++) {
-                try {
-                  var parts = commonSavePaths[i].split('/');
-                  var dir = '';
-                  for (var j = 1; j < parts.length - 1; j++) {
-                    dir += '/' + parts[j];
-                    try { fileSystem.mkdir(dir); } catch(e) {}
-                  }
-                  fileSystem.writeFile(commonSavePaths[i], data);
-                } catch(e) {}
-              }
-            }
+            localStorage.setItem('sm64_save_file', btoa(binary));
             alert("Save imported successfully! Reload the webpage to load your save.");
           } catch (err) {
             alert("Error importing save: " + err.message);
           }
         };
+        reader.onerror = function() {
+          alert("Unable to read the selected save file.");
+        };
         reader.readAsArrayBuffer(file);
+        event.target.value = '';
       }
 
       // Mobile Touch & Mouse Joystick Synthetic Events Handler
