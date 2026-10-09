@@ -21,7 +21,7 @@
         <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
         <button id="btn-export-save" onclick="exportSave()">backup save</button>
         <button id="btn-import-save" onclick="document.getElementById('file-input').click()">load save</button>
-        <button id="btn-touch" onclick="toggleTouchControls()">toggle touch</button>
+        <button id="btn-touch">toggle touch</button>
         <input type="file" id="file-input" style="display:none;" onchange="importSave(event)" accept=".bin">
       </div>
 
@@ -55,14 +55,12 @@
         </div>
       </div>
 
-      <!-- Customizable Touch Layout Controls -->
-<div id="edit-layout-btn" class="layout-icon">✏️</div>
-<div id="reset-layout-btn" class="layout-icon" style="display: none;">🔄</div>
-      
       <!-- Image-based Touch Controls -->
       <div id="touch-controls">
+        <div id="edit-layout-btn" class="layout-icon">✏️</div>
+        <div id="reset-layout-btn" class="layout-icon" style="display: none;">🔄</div>
         
-        <div id="joystick-container">
+        <div id="joystick-container" class="touch-button">
           <div id="joystick-base">
             <div id="joystick-knob"></div>
           </div>
@@ -70,19 +68,19 @@
 
         <div id="touch-actions">
           <!-- R & Start Buttons -->
-          <button class="t-btn action-r" data-key="ShiftRight"></button>
-          <button class="t-btn action-start" data-key="Space"></button>
+          <button id="touch-r" class="t-btn touch-button action-r" data-key="ShiftRight"></button>
+          <button id="touch-start" class="t-btn touch-button action-start" data-key="Space"></button>
 
           <!-- C-Buttons -->
-          <button class="t-btn action-c-u" data-key="ArrowUp"></button>
-          <button class="t-btn action-c-d" data-key="ArrowDown"></button>
-          <button class="t-btn action-c-l" data-key="ArrowLeft"></button>
-          <button class="t-btn action-c-r" data-key="ArrowRight"></button>
+          <button id="touch-c-up" class="t-btn touch-button action-c-u" data-key="ArrowUp"></button>
+          <button id="touch-c-down" class="t-btn touch-button action-c-d" data-key="ArrowDown"></button>
+          <button id="touch-c-left" class="t-btn touch-button action-c-l" data-key="ArrowLeft"></button>
+          <button id="touch-c-right" class="t-btn touch-button action-c-r" data-key="ArrowRight"></button>
 
           <!-- Standard Action Face Buttons -->
-          <button class="t-btn action-a" data-key="KeyL"></button>
-          <button class="t-btn action-b" data-key="Comma"></button>
-          <button class="t-btn action-z" data-key="KeyK"></button>
+          <button id="touch-a" class="t-btn touch-button action-a" data-key="KeyL"></button>
+          <button id="touch-b" class="t-btn touch-button action-b" data-key="Comma"></button>
+          <button id="touch-z" class="t-btn touch-button action-z" data-key="KeyK"></button>
         </div>
       </div>
 
@@ -90,27 +88,30 @@
 
     <script type='text/javascript'>
 
-      // Make sure all your in-game buttons (A, B, Joystick, etc) have class="touch-button" and unique IDs!
-const controls = document.querySelectorAll('.touch-button'); 
+const controls = document.querySelectorAll('.touch-button');
 let isEditMode = false;
 
 const editBtn = document.getElementById('edit-layout-btn');
 const resetBtn = document.getElementById('reset-layout-btn');
 
-// Toggle Edit Mode and swap emojis
-editBtn.addEventListener('click', () => {
-    isEditMode = !isEditMode;
+document.getElementById('btn-touch').addEventListener('click', toggleTouchControls);
+
+function setEditMode(enabled) {
+    isEditMode = enabled;
     document.body.classList.toggle('edit-mode-active', isEditMode);
-    
+
     if (isEditMode) {
-        editBtn.innerText = '✅'; 
-        resetBtn.style.display = 'flex'; 
+        editBtn.innerText = '✅';
+        resetBtn.style.display = 'flex';
     } else {
-        editBtn.innerText = '✏️'; 
-        resetBtn.style.display = 'none'; 
-        saveLayout(); 
+        editBtn.innerText = '✏️';
+        resetBtn.style.display = 'none';
+        activeControl = null;
+        saveLayout();
     }
-});
+}
+
+editBtn.addEventListener('click', () => setEditMode(!isEditMode));
 
 // Reset with a safety confirmation
 resetBtn.addEventListener('click', () => {
@@ -122,19 +123,17 @@ resetBtn.addEventListener('click', () => {
 
 // Dragging Logic Variables
 let activeControl = null;
-let startX, startY, initialLeft, initialTop;
+let startX, startY, initialX, initialY;
 
 controls.forEach(control => {
     control.addEventListener('pointerdown', (e) => {
         if (!isEditMode) return;
-        
+
         activeControl = control;
         startX = e.clientX;
         startY = e.clientY;
-
-        const rect = control.getBoundingClientRect();
-        initialLeft = rect.left;
-        initialTop = rect.top;
+        initialX = parseFloat(control.dataset.layoutX) || 0;
+        initialY = parseFloat(control.dataset.layoutY) || 0;
 
         control.setPointerCapture(e.pointerId);
     });
@@ -142,26 +141,20 @@ controls.forEach(control => {
     control.addEventListener('pointermove', (e) => {
         if (!isEditMode || activeControl !== control) return;
 
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-
-        // Convert to viewport percentages (vw/vh) to scale properly on all devices
-        const newLeft = ((initialLeft + dx) / window.innerWidth) * 100;
-        const newTop = ((initialTop + dy) / window.innerHeight) * 100;
-
-        control.style.left = `${newLeft}vw`;
-        control.style.top = `${newTop}vh`;
-        
-        // Remove default CSS pinning so the new coordinates actually apply
-        control.style.right = 'auto'; 
-        control.style.bottom = 'auto';
+        const newX = initialX + ((e.clientX - startX) / window.innerWidth) * 100;
+        const newY = initialY + ((e.clientY - startY) / window.innerHeight) * 100;
+        control.dataset.layoutX = newX;
+        control.dataset.layoutY = newY;
+        control.style.transform = `translate(${newX}vw, ${newY}vh)`;
     });
 
-    control.addEventListener('pointerup', (e) => {
-        if (!isEditMode || activeControl !== control) return;
-        activeControl.releasePointerCapture(e.pointerId);
+    function finishDrag() {
+        if (activeControl !== control) return;
         activeControl = null;
-    });
+    }
+
+    control.addEventListener('pointerup', finishDrag);
+    control.addEventListener('pointercancel', finishDrag);
 });
 
 // Save to Browser Storage
@@ -169,8 +162,8 @@ function saveLayout() {
     const layout = {};
     controls.forEach(control => {
         layout[control.id] = {
-            left: control.style.left,
-            top: control.style.top
+            x: parseFloat(control.dataset.layoutX) || 0,
+            y: parseFloat(control.dataset.layoutY) || 0
         };
     });
     localStorage.setItem('sm64_touch_layout', JSON.stringify(layout));
@@ -183,10 +176,11 @@ function loadLayout() {
         const layout = JSON.parse(saved);
         controls.forEach(control => {
             if (layout[control.id]) {
-                control.style.left = layout[control.id].left;
-                control.style.top = layout[control.id].top;
-                control.style.right = 'auto';
-                control.style.bottom = 'auto';
+                const x = Number(layout[control.id].x) || 0;
+                const y = Number(layout[control.id].y) || 0;
+                control.dataset.layoutX = x;
+                control.dataset.layoutY = y;
+                control.style.transform = `translate(${x}vw, ${y}vh)`;
             }
         });
     }
@@ -336,13 +330,15 @@ loadLayout();
         buttons.forEach(function(btn) {
           var key = btn.getAttribute('data-key');
           
-          function pressKey(e) { 
-            e.preventDefault(); 
-            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true })); 
+          function pressKey(e) {
+            e.preventDefault();
+            if (isEditMode) return;
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
           }
-          function releaseKey(e) { 
-            e.preventDefault(); 
-            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true })); 
+          function releaseKey(e) {
+            e.preventDefault();
+            if (isEditMode) return;
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
           }
 
           btn.addEventListener('touchstart', pressKey, { passive: false });
@@ -358,6 +354,7 @@ loadLayout();
 
         function startDrag(e) {
           e.preventDefault();
+          if (isEditMode) return;
           isDraggingJoystick = true;
           var clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
           var clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
@@ -465,6 +462,7 @@ loadLayout();
           touchDiv.style.display = 'block';
           setupTouchControls();
         } else {
+          if (isEditMode) setEditMode(false);
           touchDiv.style.display = 'none';
         }
       }
