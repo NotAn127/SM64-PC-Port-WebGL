@@ -24,19 +24,39 @@ body, html {
   color: #fff;
 }
 
+/* Base Game Container */
+#game-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  overflow: hidden;
+}
+
+canvas.emscripten {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border: none;
+}
+
 /* Toolbar Controls */
 #toolbar {
   position: absolute;
   top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
+  z-index: 60;
   display: flex;
   gap: 10px;
   background: rgba(0, 0, 0, 0.6);
   padding: 8px 16px;
   border-radius: 20px;
   backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
 }
 
 #toolbar button {
@@ -56,26 +76,10 @@ body, html {
   color: #000;
 }
 
-/* Game Canvas Display */
-#game-container {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-canvas.emscripten {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border: none;
-}
-
 /* Instructions Modal */
 .modal {
   display: none;
-  position: fixed;
+  position: absolute;
   z-index: 100;
   left: 0;
   top: 0;
@@ -137,16 +141,17 @@ a {
   color: #09ff00;
 }
 
-/* Touch Controls */
+/* Universal Touch Layer overlay */
 #touch-controls {
   display: none;
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
   z-index: 50;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 .t-btn {
@@ -158,23 +163,44 @@ a {
   border-radius: 50%;
   font-weight: bold;
   user-select: none;
+  -webkit-user-select: none;
 }
 
-/* D-Pad Positioning */
-#touch-dpad {
+/* Advanced Virtual Joystick */
+#joystick-container {
   position: absolute;
   bottom: 40px;
   left: 40px;
   width: 120px;
   height: 120px;
+  pointer-events: auto;
 }
 
-.dpad-u { top: 0; left: 40px; width: 40px; height: 40px; }
-.dpad-d { bottom: 0; left: 40px; width: 40px; height: 40px; }
-.dpad-l { top: 40px; left: 0; width: 40px; height: 40px; }
-.dpad-r { top: 40px; right: 0; width: 40px; height: 40px; }
+#joystick-base {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.15);
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
 
-/* Action Buttons Positioning */
+#joystick-knob {
+  width: 50px;
+  height: 50px;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(150, 150, 150, 0.7) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  position: absolute;
+  top: calc(50% - 25px);
+  left: calc(50% - 25px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  transform: translate(0px, 0px);
+  pointer-events: none;
+}
+
+/* Action Buttons */
 #touch-actions {
   position: absolute;
   bottom: 40px;
