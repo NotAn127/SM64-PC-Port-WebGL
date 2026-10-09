@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Mario 64 PC Web!🎩</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  </head>
+  <body>
+
+    <!-- Floating Top Toolbar -->
+    <div id="toolbar">
+      <button id="btn-fullscreen" onclick="toggleFullscreen()">fullscreen</button>
+      <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
+      <button id="btn-export-save" onclick="exportSave()">backup save</button>
+      <button id="btn-import-save" onclick="document.getElementById('file-input').click()">load save</button>
+      <input type="file" id="file-input" style="display:none;" onchange="importSave(event)" accept=".bin">
+    </div>
+
+    <!-- Instructions Overlay Modal -->
+    <div id="controls-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-btn" onclick="toggleInstructions()">&times;</span>
+        <img src="images/SuperMario64.png" alt="Super Mario 64" class="header-logo">
+        
+        <div class="instructions-grid">
+          <div class="instruction-box">
+            <h3>Keyboard Controls</h3>
+            <ul>
+              <li><strong>Move:</strong> WASD</li>
+              <li><strong>A (Jump):</strong> L</li>
+              <li><strong>B (Attack):</strong> ,</li>
+              <li><strong>Z (Crouch):</strong> K</li>
+              <li><strong>R (Camera):</strong> Shift</li>
+              <li><strong>Start:</strong> Space</li>
+              <li><strong>C-Buttons:</strong> Arrow Keys</li>
+            </ul>
+          </div>
+          <div class="instruction-box">
+            <h3>Features & Info</h3>
+            <p>Gamepad support is enabled automatically upon plugging in a controller.</p>
+            <p>Save games persist in your browser storage automatically.</p>
+            <p><a href="https://notan127.github.io/SM64-PC-Port-WebGL/classic/" target="_blank">Switch to Classic Port</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Container -->
+    <div id="game-container">
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+
+    <!-- Touch Controls for Mobile/Tablet -->
+    <div id="touch-controls">
+      <div id="touch-dpad">
+        <button class="t-btn dpad-u" data-key="KeyW">▲</button>
+        <button class="t-btn dpad-l" data-key="KeyA">◄</button>
+        <button class="t-btn dpad-r" data-key="KeyD">►</button>
+        <button class="t-btn dpad-d" data-key="KeyS">▼</button>
+      </div>
+
+      <div id="touch-actions">
+        <button class="t-btn action-a" data-key="KeyL">A</button>
+        <button class="t-btn action-b" data-key="Comma">B</button>
+        <button class="t-btn action-z" data-key="KeyK">Z</button>
+        <button class="t-btn action-start" data-key="Space">START</button>
+      </div>
+    </div>
+
+    <script type='text/javascript'>
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.log(text);
+        },
+        printErr: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.error(text);
+        },
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+          canvas.addEventListener("webglcontextlost", function(e) {
+            alert('WebGL context lost. Please reload the page.');
+            e.preventDefault();
+          }, false);
+          return canvas;
+        })(),
+        setStatus: function(text) {}
+      };
+
+      function toggleFullscreen() {
+        var canvas = document.getElementById('canvas');
+        if (!document.fullscreenElement) {
+          if (canvas.requestFullscreen) canvas.requestFullscreen();
+          else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+        } else {
+          if (document.exitFullscreen) document.exitFullscreen();
+        }
+      }
+
+      function toggleInstructions() {
+        var modal = document.getElementById('controls-modal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+      }
+
+      // Save Data Management via Emscripten Virtual File System
+      function exportSave() {
+        try {
+          var saveArray = FS.readFile('/sm64_save_file.bin');
+          var blob = new Blob([saveArray], { type: 'application/octet-stream' });
+          var link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = 'sm64_save_file.bin';
+          link.click();
+        } catch (err) {
+          alert("Save file not found or game has not generated one yet!");
+        }
+      }
+
+      function importSave(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var data = new Uint8Array(e.target.result);
+          FS.writeFile('/sm64_save_file.bin', data);
+          alert("Save imported successfully! Reload the page to load your save.");
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      // Mobile Touch Synthetic Events Handler
+      function setupTouchButtons() {
+        var buttons = document.querySelectorAll('.t-btn');
+        buttons.forEach(function(btn) {
+          var key = btn.getAttribute('data-key');
+          
+          btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
+          });
+
+          btn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+          });
+        });
+      }
+
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+        document.getElementById('touch-controls').style.display = 'block';
+        setupTouchButtons();
+      }
+    </script>
+    <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
+  </body>
+</html>
