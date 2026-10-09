@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Super Mario 64 PC Web!🎩</title>
+    <title>Super Mario 64 PC Web!</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   </head>
@@ -54,12 +54,9 @@
         </div>
       </div>
 
-      <!-- Touch Controls with Interactive Virtual Joystick -->
+      <!-- Image-based Touch Controls -->
       <div id="touch-controls">
         
-        <!-- R Shoulder Button (Top Right) -->
-        <button class="t-btn action-r" data-key="ShiftLeft">R</button>
-
         <div id="joystick-container">
           <div id="joystick-base">
             <div id="joystick-knob"></div>
@@ -67,17 +64,20 @@
         </div>
 
         <div id="touch-actions">
-          <!-- C-Buttons -->
-          <button class="t-btn action-c-u" data-key="ArrowUp">C▲</button>
-          <button class="t-btn action-c-d" data-key="ArrowDown">C▼</button>
-          <button class="t-btn action-c-l" data-key="ArrowLeft">C◄</button>
-          <button class="t-btn action-c-r" data-key="ArrowRight">C►</button>
+          <!-- R & Start Buttons -->
+          <button class="t-btn action-r" data-key="ShiftLeft"></button>
+          <button class="t-btn action-start" data-key="Space"></button>
 
-          <!-- Standard Action Buttons -->
-          <button class="t-btn action-a" data-key="KeyL">A</button>
-          <button class="t-btn action-b" data-key="Comma">B</button>
-          <button class="t-btn action-z" data-key="KeyK">Z</button>
-          <button class="t-btn action-start" data-key="Space">START</button>
+          <!-- C-Buttons -->
+          <button class="t-btn action-c-u" data-key="ArrowUp"></button>
+          <button class="t-btn action-c-d" data-key="ArrowDown"></button>
+          <button class="t-btn action-c-l" data-key="ArrowLeft"></button>
+          <button class="t-btn action-c-r" data-key="ArrowRight"></button>
+
+          <!-- Standard Action Face Buttons -->
+          <button class="t-btn action-a" data-key="KeyL"></button>
+          <button class="t-btn action-b" data-key="Comma"></button>
+          <button class="t-btn action-z" data-key="KeyK"></button>
         </div>
       </div>
 
@@ -98,9 +98,11 @@
         canvas: (function() {
           var canvas = document.getElementById('canvas');
           
+          // Force explicit pixel dimensions for mobile WebGL compatibility
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
           
+          // Auto-resize if the user rotates their phone
           window.addEventListener('resize', function() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -116,6 +118,7 @@
         setStatus: function(text) {}
       };
 
+      // Toggles the entire game-container so overlays stay visible in Fullscreen
       function toggleFullscreen() {
         var container = document.getElementById('game-container');
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -138,6 +141,7 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
       }
 
+      // Upgraded Save Data Management
       function getFS() {
         if (typeof FS !== 'undefined') return FS;
         if (typeof Module !== 'undefined' && Module.FS) return Module.FS;
@@ -221,6 +225,7 @@
         reader.readAsArrayBuffer(file);
       }
 
+      // Mobile Touch & Mouse Joystick Synthetic Events Handler
       var touchControlsSetup = false;
       var joystickBase = null;
       var joystickKnob = null;
@@ -231,6 +236,7 @@
       function setupTouchControls() {
         if (touchControlsSetup) return;
 
+        // Action Buttons (Touch + Mouse Support)
         var buttons = document.querySelectorAll('.t-btn');
         buttons.forEach(function(btn) {
           var key = btn.getAttribute('data-key');
@@ -251,6 +257,7 @@
           btn.addEventListener('mouseleave', releaseKey);
         });
 
+        // Joystick Event Listeners
         joystickBase = document.getElementById('joystick-base');
         joystickKnob = document.getElementById('joystick-knob');
 
@@ -260,12 +267,14 @@
           var clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
           var clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
           if (e.changedTouches) joystickPointerId = e.changedTouches[0].identifier;
+          
           updateJoystick(clientX, clientY);
         }
 
         function moveDrag(e) {
           if (!isDraggingJoystick) return;
           e.preventDefault();
+          
           var clientX = e.clientX;
           var clientY = e.clientY;
           
@@ -275,6 +284,7 @@
             clientX = touch.clientX;
             clientY = touch.clientY;
           }
+          
           updateJoystick(clientX, clientY);
         }
 
@@ -298,11 +308,13 @@
           }
         }
 
+        // Bind Touch Events
         joystickBase.addEventListener('touchstart', startDrag, { passive: false });
         document.addEventListener('touchmove', moveDrag, { passive: false });
         document.addEventListener('touchend', endDrag);
         document.addEventListener('touchcancel', endDrag);
         
+        // Bind Mouse Events (For PC Testing)
         joystickBase.addEventListener('mousedown', startDrag);
         document.addEventListener('mousemove', moveDrag);
         document.addEventListener('mouseup', endDrag);
@@ -374,3 +386,5 @@
     <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
   </body>
 </html>
+
+```
