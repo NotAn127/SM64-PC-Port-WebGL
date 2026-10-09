@@ -9499,3 +9499,46 @@ run();
 
 // {{MODULE_ADDITIONS}}
 
+// Mobile Touch Synthetic Events Handler
+      var touchButtonsSetup = false;
+
+      function setupTouchButtons() {
+        if (touchButtonsSetup) return; // Prevent setting up multiple times
+        
+        var buttons = document.querySelectorAll('.t-btn');
+        buttons.forEach(function(btn) {
+          var key = btn.getAttribute('data-key');
+          
+          btn.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
+          });
+
+          btn.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+          });
+        });
+        touchButtonsSetup = true;
+      }
+
+      function toggleTouchControls() {
+        var touchDiv = document.getElementById('touch-controls');
+        if (touchDiv.style.display === 'none' || touchDiv.style.display === '') {
+          touchDiv.style.display = 'block';
+          setupTouchButtons();
+        } else {
+          touchDiv.style.display = 'none';
+        }
+      }
+
+      // Only auto-show on actual mobile OS, not just any touchscreen (like a Windows laptop)
+      var isMobileOS = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobileOS) {
+        document.getElementById('touch-controls').style.display = 'block';
+        setupTouchButtons();
+      } else {
+        // Ensure it starts hidden on desktop
+        document.getElementById('touch-controls').style.display = 'none';
+      }
