@@ -91,24 +91,6 @@
 const controls = document.querySelectorAll('.touch-button');
 let isEditMode = false;
 
-function vibrateTouchControls() {
-    if (isEditMode) return;
-    if (typeof navigator.vibrate !== 'function') {
-        console.warn('Touch haptics are unavailable: this browser does not support the Vibration API.');
-        return;
-    }
-
-    if (!navigator.vibrate(50)) {
-        console.warn('Touch haptics were not accepted by the device or browser.');
-    }
-}
-
-document.getElementById('touch-controls').addEventListener('pointerdown', (event) => {
-    if (event.pointerType === 'touch' && event.target.closest('.touch-button')) {
-        vibrateTouchControls();
-    }
-}, true);
-
 const editBtn = document.getElementById('edit-layout-btn');
 const resetBtn = document.getElementById('reset-layout-btn');
 
@@ -144,6 +126,21 @@ let activeControl = null;
 let startX, startY, initialX, initialY;
 
 controls.forEach(control => {
+    control.addEventListener('pointerdown', (e) => {
+        console.log('Button pressed:', control.id);
+        if (isEditMode) return;
+
+        if (navigator.vibrate) {
+            console.log('Vibration API supported, attempting to vibrate...');
+            const vibrationStarted = navigator.vibrate(15);
+            if (!vibrationStarted) {
+                console.warn('The browser or device did not start the vibration.');
+            }
+        } else {
+            console.log('Vibration API NOT supported by this browser.');
+        }
+    });
+
     control.addEventListener('pointerdown', (e) => {
         if (!isEditMode) return;
 
