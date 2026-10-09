@@ -251,7 +251,9 @@ a {
     align-items: center;
     cursor: pointer;
     user-select: none;
-    -webkit-tap-highlight-color: transparent; 
+    -webkit-tap-highlight-color: transparent;
+    pointer-events: auto;
+    touch-action: manipulation;
 }
 
 /* Pin them to the top right of the screen */
@@ -269,6 +271,7 @@ a {
 .touch-button {
     touch-action: none; /* Prevents screen scrolling on mobile while dragging */
     position: absolute;
+    pointer-events: auto;
 }
 
 /* What the buttons look like while Edit Mode is active */
