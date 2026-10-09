@@ -127,6 +127,9 @@ let startX, startY, initialX, initialY;
 
 controls.forEach(control => {
     control.addEventListener('pointerdown', (e) => {
+        if (!isEditMode && typeof navigator.vibrate === 'function') {
+            navigator.vibrate(15);
+        }
         if (!isEditMode) return;
 
         activeControl = control;
