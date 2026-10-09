@@ -9481,3 +9481,18 @@ run();
 
 
 
+// --- BEGIN AUDIO AUTOPLAY PATCH ---
+function resumeEmscriptenAudio() {
+    if (typeof Module !== 'undefined' && Module['SDL2'] && Module['SDL2'].audioContext) {
+        if (Module['SDL2'].audioContext.state === 'suspended') {
+            Module['SDL2'].audioContext.resume();
+        }
+    }
+}
+
+if (typeof window !== 'undefined') {
+    ['mousedown', 'touchstart', 'keydown'].forEach(function(eventName) {
+        window.addEventListener(eventName, resumeEmscriptenAudio, { passive: true });
+    });
+}
+// --- END AUDIO AUTOPLAY PATCH ---
