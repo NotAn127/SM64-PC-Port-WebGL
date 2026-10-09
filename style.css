@@ -24,7 +24,6 @@ body, html {
   color: #fff;
 }
 
-/* Base Game Container */
 #game-container {
   position: relative;
   width: 100vw;
@@ -141,7 +140,7 @@ a {
   color: #09ff00;
 }
 
-/* Universal Touch Layer overlay */
+/* Touch Control Containers */
 #touch-controls {
   display: none;
   position: absolute;
@@ -154,79 +153,78 @@ a {
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
+/* Single Sprite Sheet Setup for all Buttons */
+.t-btn, #joystick-base, #joystick-knob {
+  background-image: url('images/buttons.png');
+  background-repeat: no-repeat;
+  background-size: 500px 500px; 
+}
+
+/* Reset t-btn defaults */
 .t-btn {
   pointer-events: auto;
   position: absolute;
-  background: rgba(255, 255, 255, 0.25);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  color: white;
-  border-radius: 50%;
-  font-weight: bold;
+  background-color: transparent;
+  border: none;
+  color: transparent;
+  border-radius: 0;
   user-select: none;
   -webkit-user-select: none;
+  cursor: pointer;
 }
 
-/* Advanced Virtual Joystick */
+/* Joystick Setup */
 #joystick-container {
   position: absolute;
   bottom: 40px;
   left: 40px;
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   pointer-events: auto;
 }
 
 #joystick-base {
   width: 100%;
   height: 100%;
-  background: rgba(255, 255, 255, 0.15);
-  border: 2px dashed rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
   position: relative;
-  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  background-position: 0px 0px; 
 }
 
 #joystick-knob {
-  width: 50px;
-  height: 50px;
-  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(150, 150, 150, 0.7) 100%);
-  border: 2px solid rgba(255, 255, 255, 0.8);
-  border-radius: 50%;
+  width: 60px;
+  height: 60px;
   position: absolute;
-  top: calc(50% - 25px);
-  left: calc(50% - 25px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+  top: calc(50% - 30px);
+  left: calc(50% - 30px);
   transform: translate(0px, 0px);
   pointer-events: none;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  background-position: -150px 0px; 
 }
 
-/* Container for all Action Buttons */
+/* Action Button Container */
 #touch-actions {
   position: absolute;
-  bottom: 40px;
-  right: 40px;
-  width: 160px;
-  height: 200px; /* Taller to fit the C-Button diamond */
+  bottom: 20px;
+  right: 20px;
+  width: 250px;
+  height: 250px;
 }
 
-/* R Shoulder Button */
-.action-r { 
-  top: 80px; 
-  right: 40px; 
-  width: 70px; 
-  height: 40px; 
-  border-radius: 10px; 
-  background: rgba(150, 150, 150, 0.5); 
-}
+/* Action Button Sprite Coordinates (Mapped directly to buttons.png) */
+.action-a { bottom: 10px; right: 10px; width: 60px; height: 60px; background-position: -0px -150px; }
+.action-b { bottom: 10px; right: 80px; width: 50px; height: 50px; background-position: -70px -150px; }
+.action-z { bottom: 80px; right: 10px; width: 50px; height: 50px; background-position: -130px -150px; }
+.action-r { top: 0px; right: 10px; width: 70px; height: 40px; background-position: -200px -150px; }
+.action-start { top: 0px; right: 90px; width: 70px; height: 35px; background-position: -280px -150px; }
 
-/* Standard Action Buttons */
-.action-a { bottom: 10px; right: 0px; width: 50px; height: 50px; background: rgba(0, 200, 0, 0.4); }
-.action-b { bottom: 0px; right: 60px; width: 50px; height: 50px; background: rgba(200, 0, 0, 0.4); }
-.action-z { bottom: 60px; right: 90px; width: 45px; height: 45px; background: rgba(0, 100, 255, 0.4); }
-.action-start { top: -20px; right: 50px; width: 60px; height: 30px; border-radius: 10px; background: rgba(150, 150, 150, 0.5); }
-
-/* C-Buttons (Yellow cluster forming a diamond) */
-.action-c-u { top: 30px; right: 35px; width: 35px; height: 35px; background: rgba(255, 200, 0, 0.5); color: #000; font-size: 0.8rem; }
-.action-c-d { top: 90px; right: 35px; width: 35px; height: 35px; background: rgba(255, 200, 0, 0.5); color: #000; font-size: 0.8rem; }
-.action-c-l { top: 60px; right: 70px; width: 35px; height: 35px; background: rgba(255, 200, 0, 0.5); color: #000; font-size: 0.8rem; }
-.action-c-r { top: 60px; right: 0px; width: 35px; height: 35px; background: rgba(255, 200, 0, 0.5); color: #000; font-size: 0.8rem; }
+/* C-Button Sprite Coordinates */
+.action-c-u { bottom: 130px; right: 120px; width: 40px; height: 40px; background-position: -0px -220px; }
+.action-c-d { bottom: 50px; right: 120px; width: 40px; height: 40px; background-position: -50px -220px; }
+.action-c-l { bottom: 90px; right: 160px; width: 40px; height: 40px; background-position: -100px -220px; }
+.action-c-r { bottom: 90px; right: 80px; width: 40px; height: 40px; background-position: -150px -220px; }
