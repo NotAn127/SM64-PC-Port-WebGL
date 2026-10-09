@@ -89,6 +89,112 @@
     </div>
 
     <script type='text/javascript'>
+
+      // Make sure all your in-game buttons (A, B, Joystick, etc) have class="touch-button" and unique IDs!
+const controls = document.querySelectorAll('.touch-button'); 
+let isEditMode = false;
+
+const editBtn = document.getElementById('edit-layout-btn');
+const resetBtn = document.getElementById('reset-layout-btn');
+
+// Toggle Edit Mode and swap emojis
+editBtn.addEventListener('click', () => {
+    isEditMode = !isEditMode;
+    document.body.classList.toggle('edit-mode-active', isEditMode);
+    
+    if (isEditMode) {
+        editBtn.innerText = '✅'; 
+        resetBtn.style.display = 'flex'; 
+    } else {
+        editBtn.innerText = '✏️'; 
+        resetBtn.style.display = 'none'; 
+        saveLayout(); 
+    }
+});
+
+// Reset with a safety confirmation
+resetBtn.addEventListener('click', () => {
+    if (confirm("Reset touch controls to default positions?")) {
+        localStorage.removeItem('sm64_touch_layout');
+        location.reload(); 
+    }
+});
+
+// Dragging Logic Variables
+let activeControl = null;
+let startX, startY, initialLeft, initialTop;
+
+controls.forEach(control => {
+    control.addEventListener('pointerdown', (e) => {
+        if (!isEditMode) return;
+        
+        activeControl = control;
+        startX = e.clientX;
+        startY = e.clientY;
+
+        const rect = control.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        control.setPointerCapture(e.pointerId);
+    });
+
+    control.addEventListener('pointermove', (e) => {
+        if (!isEditMode || activeControl !== control) return;
+
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        // Convert to viewport percentages (vw/vh) to scale properly on all devices
+        const newLeft = ((initialLeft + dx) / window.innerWidth) * 100;
+        const newTop = ((initialTop + dy) / window.innerHeight) * 100;
+
+        control.style.left = `${newLeft}vw`;
+        control.style.top = `${newTop}vh`;
+        
+        // Remove default CSS pinning so the new coordinates actually apply
+        control.style.right = 'auto'; 
+        control.style.bottom = 'auto';
+    });
+
+    control.addEventListener('pointerup', (e) => {
+        if (!isEditMode || activeControl !== control) return;
+        activeControl.releasePointerCapture(e.pointerId);
+        activeControl = null;
+    });
+});
+
+// Save to Browser Storage
+function saveLayout() {
+    const layout = {};
+    controls.forEach(control => {
+        layout[control.id] = {
+            left: control.style.left,
+            top: control.style.top
+        };
+    });
+    localStorage.setItem('sm64_touch_layout', JSON.stringify(layout));
+}
+
+// Load from Browser Storage on Startup
+function loadLayout() {
+    const saved = localStorage.getItem('sm64_touch_layout');
+    if (saved) {
+        const layout = JSON.parse(saved);
+        controls.forEach(control => {
+            if (layout[control.id]) {
+                control.style.left = layout[control.id].left;
+                control.style.top = layout[control.id].top;
+                control.style.right = 'auto';
+                control.style.bottom = 'auto';
+            }
+        });
+    }
+}
+
+// Run layout load immediately when the script runs
+loadLayout();
+      
       var Module = {
         preRun: [],
         postRun: [],
