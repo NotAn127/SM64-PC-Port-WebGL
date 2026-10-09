@@ -15,7 +15,7 @@
       <!-- Canvas Display -->
       <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 
-      <!-- Floating Top Toolbar (contained within game-container) -->
+      <!-- Floating Top Toolbar -->
       <div id="toolbar">
         <button id="btn-fullscreen" onclick="toggleFullscreen()">fullscreen</button>
         <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
@@ -56,6 +56,10 @@
 
       <!-- Touch Controls with Interactive Virtual Joystick -->
       <div id="touch-controls">
+        
+        <!-- R Shoulder Button (Top Right) -->
+        <button class="t-btn action-r" data-key="ShiftLeft">R</button>
+
         <div id="joystick-container">
           <div id="joystick-base">
             <div id="joystick-knob"></div>
@@ -63,6 +67,13 @@
         </div>
 
         <div id="touch-actions">
+          <!-- C-Buttons -->
+          <button class="t-btn action-c-u" data-key="ArrowUp">C▲</button>
+          <button class="t-btn action-c-d" data-key="ArrowDown">C▼</button>
+          <button class="t-btn action-c-l" data-key="ArrowLeft">C◄</button>
+          <button class="t-btn action-c-r" data-key="ArrowRight">C►</button>
+
+          <!-- Standard Action Buttons -->
           <button class="t-btn action-a" data-key="KeyL">A</button>
           <button class="t-btn action-b" data-key="Comma">B</button>
           <button class="t-btn action-z" data-key="KeyK">Z</button>
@@ -87,11 +98,9 @@
         canvas: (function() {
           var canvas = document.getElementById('canvas');
           
-          // Force explicit pixel dimensions for mobile WebGL compatibility
           canvas.width = window.innerWidth;
           canvas.height = window.innerHeight;
           
-          // Auto-resize if the user rotates their phone
           window.addEventListener('resize', function() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -107,7 +116,6 @@
         setStatus: function(text) {}
       };
 
-      // Toggles the entire game-container so overlays stay visible in Fullscreen
       function toggleFullscreen() {
         var container = document.getElementById('game-container');
         if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -130,7 +138,6 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
       }
 
-      // Upgraded Save Data Management
       function getFS() {
         if (typeof FS !== 'undefined') return FS;
         if (typeof Module !== 'undefined' && Module.FS) return Module.FS;
@@ -214,7 +221,6 @@
         reader.readAsArrayBuffer(file);
       }
 
-      // Mobile Touch & Mouse Joystick Synthetic Events Handler
       var touchControlsSetup = false;
       var joystickBase = null;
       var joystickKnob = null;
@@ -225,7 +231,6 @@
       function setupTouchControls() {
         if (touchControlsSetup) return;
 
-        // Action Buttons (Touch + Mouse Support)
         var buttons = document.querySelectorAll('.t-btn');
         buttons.forEach(function(btn) {
           var key = btn.getAttribute('data-key');
@@ -246,36 +251,30 @@
           btn.addEventListener('mouseleave', releaseKey);
         });
 
-        // Joystick Event Listeners
         joystickBase = document.getElementById('joystick-base');
         joystickKnob = document.getElementById('joystick-knob');
 
         function startDrag(e) {
           e.preventDefault();
           isDraggingJoystick = true;
-          // Determine if input is touch or mouse
           var clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
           var clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
           if (e.changedTouches) joystickPointerId = e.changedTouches[0].identifier;
-          
           updateJoystick(clientX, clientY);
         }
 
         function moveDrag(e) {
           if (!isDraggingJoystick) return;
           e.preventDefault();
-          
           var clientX = e.clientX;
           var clientY = e.clientY;
           
-          // Handle multi-touch arrays if mobile
           if (e.changedTouches) {
             var touch = Array.from(e.touches).find(t => t.identifier === joystickPointerId);
             if (!touch) return;
             clientX = touch.clientX;
             clientY = touch.clientY;
           }
-          
           updateJoystick(clientX, clientY);
         }
 
@@ -284,14 +283,13 @@
           
           if (e.changedTouches) {
             var ended = Array.from(e.changedTouches).find(t => t.identifier === joystickPointerId);
-            if (!ended) return; // Only stop if the specific joystick finger was lifted
+            if (!ended) return; 
           }
           
           isDraggingJoystick = false;
           joystickPointerId = null;
           joystickKnob.style.transform = 'translate(0px, 0px)';
           
-          // Release any active simulated directional keys
           for (var key in joystickKeys) {
             if (joystickKeys[key]) {
               window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
@@ -300,13 +298,11 @@
           }
         }
 
-        // Bind Touch Events
         joystickBase.addEventListener('touchstart', startDrag, { passive: false });
         document.addEventListener('touchmove', moveDrag, { passive: false });
         document.addEventListener('touchend', endDrag);
         document.addEventListener('touchcancel', endDrag);
         
-        // Bind Mouse Events (For PC Testing)
         joystickBase.addEventListener('mousedown', startDrag);
         document.addEventListener('mousemove', moveDrag);
         document.addEventListener('mouseup', endDrag);
@@ -324,7 +320,6 @@
         var distance = Math.sqrt(dx * dx + dy * dy);
         var maxRadius = rect.width / 2;
 
-        // Clamp the knob inside the base circle
         if (distance > maxRadius) {
           dx = (dx / distance) * maxRadius;
           dy = (dy / distance) * maxRadius;
@@ -336,15 +331,14 @@
         var deadzone = 12;
         var keysToPress = { 'KeyW': false, 'KeyS': false, 'KeyA': false, 'KeyD': false };
 
-        // Parse visual direction into keyboard inputs
         if (distance > deadzone) {
           var ndx = dx / distance;
           var ndy = dy / distance;
 
-          if (ndx > 0.38) keysToPress['KeyD'] = true; // Right
-          if (ndx < -0.38) keysToPress['KeyA'] = true; // Left
-          if (ndy > 0.38) keysToPress['KeyS'] = true; // Down 
-          if (ndy < -0.38) keysToPress['KeyW'] = true; // Up 
+          if (ndx > 0.38) keysToPress['KeyD'] = true; 
+          if (ndx < -0.38) keysToPress['KeyA'] = true; 
+          if (ndy > 0.38) keysToPress['KeyS'] = true; 
+          if (ndy < -0.38) keysToPress['KeyW'] = true; 
         }
 
         for (var key in keysToPress) {
@@ -380,5 +374,3 @@
     <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
   </body>
 </html>
-
-```
