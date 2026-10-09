@@ -1,22 +1,54 @@
-# SM64 (PC Port) Web
+# Super Mario 64 PC Port for the Web
 
-    Enjoy this super cool port I guess
+A browser-based version of the Super Mario 64 PC port, with keyboard, gamepad,
+and optional touch controls.
 
-<img src="images/SuperMario64.png" alt="Alt text" title="Optional title" width="250" height="100">
+## Play
 
-PC Port in the Web, this took a while to get, 
-Nintendo please don't sue me😬
+Open the site in a modern browser that supports WebAssembly and WebGL. The
+project is deployed with GitHub Pages. To run it locally, serve the repository
+root over HTTP rather than opening `index.html` directly:
 
-Enjoy it while you can, probably lmao
+```sh
+python3 -m http.server 8000
+```
 
-This one has more features than the dodo websites you see from other people, it also has mobile support with touch controls
+Then visit <http://localhost:8000>.
 
-I got the source from this guy
-https://augustberchelmann.com/mario/
+## Controls
 
-I changed it a bit
+| Action | Keyboard |
+| --- | --- |
+| Move | W, A, S, D |
+| Jump (A) | L |
+| Attack (B) | Comma (`,`) |
+| Crouch (Z) | K |
+| Camera (R) | Shift |
+| Start | Space |
+| C-buttons | Arrow keys |
 
-<img src="screenshots/1.png" alt="Alt text" title="Menu">
-<img src="screenshots/2.png" alt="Alt text" title="OtherMenu">
-<img src="screenshots/3.png" alt="Alt text" title="Gameplay">
-<img src="screenshots/4.png" alt="Alt text" title="OptionsPcPort">
+Connect a gamepad to play with a controller. On mobile, touch controls appear
+automatically; on desktop, use **toggle touch** to show or hide them. The touch
+layout can be repositioned with the edit control.
+
+## Saves
+
+The game stores save data in your browser. Use **backup save** to download a
+copy or **load save** to import a 512-byte save file. Browser storage is local
+to the browser and device, so export a backup before clearing site data.
+
+## Screenshots
+
+| Main menu | Other menu |
+| --- | --- |
+| ![Main menu](screenshots/1.png) | ![Other menu](screenshots/2.png) |
+
+| Gameplay | Options |
+| --- | --- |
+| ![Gameplay](screenshots/3.png) | ![Options](screenshots/4.png) |
+
+## Credits
+
+This project is based on the web port by
+[August Berchelmann](https://augustberchelmann.com/mario/), with modifications
+and additional browser controls.
