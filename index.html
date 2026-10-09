@@ -2,72 +2,74 @@
 <html lang="en-us">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Super Mario 64 PC Web!🎩</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   </head>
   <body>
 
-    <!-- Floating Top Toolbar -->
-    <div id="toolbar">
-      <button id="btn-fullscreen" onclick="toggleFullscreen()">fullscreen</button>
-      <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
-      <button id="btn-export-save" onclick="exportSave()">backup save</button>
-      <button id="btn-import-save" onclick="document.getElementById('file-input').click()">load save</button>
-      <button id="btn-touch" onclick="toggleTouchControls()">toggle touch</button>
-      <input type="file" id="file-input" style="display:none;" onchange="importSave(event)" accept=".bin">
-    </div>
+    <!-- Target the entire game-container for Fullscreen to protect overlays -->
+    <div id="game-container">
+      
+      <!-- Canvas Display -->
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
 
-    <!-- Instructions Overlay Modal -->
-    <div id="controls-modal" class="modal">
-      <div class="modal-content">
-        <span class="close-btn" onclick="toggleInstructions()">&times;</span>
-        <img src="images/SuperMario64.png" alt="Super Mario 64" class="header-logo">
-        
-        <div class="instructions-grid">
-          <div class="instruction-box">
-            <h3>Keyboard Controls</h3>
-            <ul>
-              <li><strong>Move:</strong> WASD</li>
-              <li><strong>A (Jump):</strong> L</li>
-              <li><strong>B (Attack):</strong> ,</li>
-              <li><strong>Z (Crouch):</strong> K</li>
-              <li><strong>R (Camera):</strong> Shift</li>
-              <li><strong>Start:</strong> Space</li>
-              <li><strong>C-Buttons:</strong> Arrow Keys</li>
-            </ul>
-          </div>
-          <div class="instruction-box">
-            <h3>Features & Info</h3>
-            <p>Gamepad support is enabled automatically upon plugging in a controller.</p>
-            <p>Save games persist in your browser storage automatically.</p>
-            <p><a href="https://notan127.github.io/SM64-PC-Port-WebGL/classic/" target="_blank">Switch to Classic Port</a></p>
+      <!-- Floating Top Toolbar (contained within game-container) -->
+      <div id="toolbar">
+        <button id="btn-fullscreen" onclick="toggleFullscreen()">fullscreen</button>
+        <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
+        <button id="btn-export-save" onclick="exportSave()">backup save</button>
+        <button id="btn-import-save" onclick="document.getElementById('file-input').click()">load save</button>
+        <button id="btn-touch" onclick="toggleTouchControls()">toggle touch</button>
+        <input type="file" id="file-input" style="display:none;" onchange="importSave(event)" accept=".bin">
+      </div>
+
+      <!-- Instructions Overlay Modal -->
+      <div id="controls-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn" onclick="toggleInstructions()">&times;</span>
+          <img src="images/SuperMario64.png" alt="Super Mario 64" class="header-logo">
+          
+          <div class="instructions-grid">
+            <div class="instruction-box">
+              <h3>Keyboard Controls</h3>
+              <ul>
+                <li><strong>Move:</strong> WASD</li>
+                <li><strong>A (Jump):</strong> L</li>
+                <li><strong>B (Attack):</strong> ,</li>
+                <li><strong>Z (Crouch):</strong> K</li>
+                <li><strong>R (Camera):</strong> Shift</li>
+                <li><strong>Start:</strong> Space</li>
+                <li><strong>C-Buttons:</strong> Arrow Keys</li>
+              </ul>
+            </div>
+            <div class="instruction-box">
+              <h3>Features & Info</h3>
+              <p>Gamepad support is enabled automatically upon plugging in a controller.</p>
+              <p>Save games persist in your browser storage automatically.</p>
+              <p><a href="https://notan127.github.io/SM64-PC-Port-WebGL/classic/" target="_blank">Switch to Classic Port</a></p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Canvas Container -->
-    <div id="game-container">
-      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
-    </div>
+      <!-- Touch Controls with Interactive Virtual Joystick -->
+      <div id="touch-controls">
+        <div id="joystick-container">
+          <div id="joystick-base">
+            <div id="joystick-knob"></div>
+          </div>
+        </div>
 
-    <!-- Touch Controls for Mobile/Tablet -->
-    <div id="touch-controls">
-      <div id="touch-dpad">
-        <button class="t-btn dpad-u" data-key="KeyW">▲</button>
-        <button class="t-btn dpad-l" data-key="KeyA">◄</button>
-        <button class="t-btn dpad-r" data-key="KeyD">►</button>
-        <button class="t-btn dpad-d" data-key="KeyS">▼</button>
+        <div id="touch-actions">
+          <button class="t-btn action-a" data-key="KeyL">A</button>
+          <button class="t-btn action-b" data-key="Comma">B</button>
+          <button class="t-btn action-z" data-key="KeyK">Z</button>
+          <button class="t-btn action-start" data-key="Space">START</button>
+        </div>
       </div>
 
-      <div id="touch-actions">
-        <button class="t-btn action-a" data-key="KeyL">A</button>
-        <button class="t-btn action-b" data-key="Comma">B</button>
-        <button class="t-btn action-z" data-key="KeyK">Z</button>
-        <button class="t-btn action-start" data-key="Space">START</button>
-      </div>
     </div>
 
     <script type='text/javascript'>
@@ -93,13 +95,21 @@
         setStatus: function(text) {}
       };
 
+      // Toggles the entire game-container so overlays stay visible in Fullscreen
       function toggleFullscreen() {
-        var canvas = document.getElementById('canvas');
-        if (!document.fullscreenElement) {
-          if (canvas.requestFullscreen) canvas.requestFullscreen();
-          else if (canvas.webkitRequestFullscreen) canvas.webkitRequestFullscreen();
+        var container = document.getElementById('game-container');
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (container.requestFullscreen) {
+            container.requestFullscreen();
+          } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+          }
         } else {
-          if (document.exitFullscreen) document.exitFullscreen();
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
         }
       }
 
@@ -140,12 +150,11 @@
             link.download = 'sm64_save_file.bin';
             link.click();
             
-            // Remember where we found it so we can import it to the exact same spot later
             localStorage.setItem('sm64_save_path', commonSavePaths[i]);
             saveFound = true;
             break; 
           } catch (err) {
-            // File not in this specific path, continue checking the next one
+            // Continues through array list paths
           }
         }
 
@@ -167,18 +176,14 @@
         var reader = new FileReader();
         reader.onload = function(e) {
           var data = new Uint8Array(e.target.result);
-          
-          // Try to load it to the last known working path, otherwise write to all common paths to be safe
           var knownPath = localStorage.getItem('sm64_save_path');
           
           try {
             if (knownPath) {
               fileSystem.writeFile(knownPath, data);
             } else {
-              // If we don't know the path, write to all possible locations
               for (var i = 0; i < commonSavePaths.length; i++) {
                 try {
-                  // Ensure directories exist before writing
                   var parts = commonSavePaths[i].split('/');
                   var dir = '';
                   for (var j = 1; j < parts.length - 1; j++) {
@@ -197,12 +202,18 @@
         reader.readAsArrayBuffer(file);
       }
 
-      // Mobile Touch Synthetic Events Handler
-      var touchButtonsSetup = false;
+      // Mobile Touch & Joystick Synthetic Events Handler
+      var touchControlsSetup = false;
+      var joystickBase = null;
+      var joystickKnob = null;
+      var isDraggingJoystick = false;
+      var joystickPointerId = null;
+      var joystickKeys = { 'KeyW': false, 'KeyS': false, 'KeyA': false, 'KeyD': false };
 
-      function setupTouchButtons() {
-        if (touchButtonsSetup) return; // Prevent setting up multiple times
-        
+      function setupTouchControls() {
+        if (touchControlsSetup) return;
+
+        // Button Listeners
         var buttons = document.querySelectorAll('.t-btn');
         buttons.forEach(function(btn) {
           var key = btn.getAttribute('data-key');
@@ -217,32 +228,126 @@
             window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
           });
         });
-        touchButtonsSetup = true;
+
+        // Joystick Event Listeners
+        joystickBase = document.getElementById('joystick-base');
+        joystickKnob = document.getElementById('joystick-knob');
+
+        joystickBase.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          if (joystickPointerId !== null) return; // limit to single touch
+          var touch = e.changedTouches[0];
+          joystickPointerId = touch.identifier;
+          isDraggingJoystick = true;
+          updateJoystick(touch);
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(e) {
+          if (!isDraggingJoystick) return;
+          var touch = null;
+          for (var i = 0; i < e.touches.length; i++) {
+            if (e.touches[i].identifier === joystickPointerId) {
+              touch = e.touches[i];
+              break;
+            }
+          }
+          if (touch) {
+            e.preventDefault();
+            updateJoystick(touch);
+          }
+        }, { passive: false });
+
+        function handleJoystickEnd(e) {
+          if (!isDraggingJoystick) return;
+          var ended = false;
+          for (var i = 0; i < e.changedTouches.length; i++) {
+            if (e.changedTouches[i].identifier === joystickPointerId) {
+              ended = true;
+              break;
+            }
+          }
+          if (ended) {
+            isDraggingJoystick = false;
+            joystickPointerId = null;
+            joystickKnob.style.transform = 'translate(0px, 0px)';
+            
+            // release any active simulated keys
+            for (var key in joystickKeys) {
+              if (joystickKeys[key]) {
+                window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+                joystickKeys[key] = false;
+              }
+            }
+          }
+        }
+
+        document.addEventListener('touchend', handleJoystickEnd);
+        document.addEventListener('touchcancel', handleJoystickEnd);
+
+        touchControlsSetup = true;
+      }
+
+      function updateJoystick(touch) {
+        var rect = joystickBase.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height / 2;
+        var dx = touch.clientX - centerX;
+        var dy = touch.clientY - centerY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var maxRadius = rect.width / 2;
+
+        if (distance > maxRadius) {
+          dx = (dx / distance) * maxRadius;
+          dy = (dy / distance) * maxRadius;
+          distance = maxRadius;
+        }
+
+        joystickKnob.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+
+        var deadzone = 12;
+        var keysToPress = { 'KeyW': false, 'KeyS': false, 'KeyA': false, 'KeyD': false };
+
+        if (distance > deadzone) {
+          var ndx = dx / distance;
+          var ndy = dy / distance;
+
+          // Split input vectors to simulate WASD analog ranges
+          if (ndx > 0.38) keysToPress['KeyD'] = true; // Right
+          if (ndx < -0.38) keysToPress['KeyA'] = true; // Left
+          if (ndy > 0.38) keysToPress['KeyS'] = true; // Down (Backward)
+          if (ndy < -0.38) keysToPress['KeyW'] = true; // Up (Forward)
+        }
+
+        for (var key in keysToPress) {
+          if (keysToPress[key] && !joystickKeys[key]) {
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
+            joystickKeys[key] = true;
+          } else if (!keysToPress[key] && joystickKeys[key]) {
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+            joystickKeys[key] = false;
+          }
+        }
       }
 
       function toggleTouchControls() {
         var touchDiv = document.getElementById('touch-controls');
         if (touchDiv.style.display === 'none' || touchDiv.style.display === '') {
           touchDiv.style.display = 'block';
-          setupTouchButtons();
+          setupTouchControls();
         } else {
           touchDiv.style.display = 'none';
         }
       }
 
-      // Only auto-show on actual mobile OS, not just any touchscreen (like a Windows laptop)
       var isMobileOS = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
       
       if (isMobileOS) {
         document.getElementById('touch-controls').style.display = 'block';
-        setupTouchButtons();
+        setupTouchControls();
       } else {
-        // Ensure it starts hidden on desktop
         document.getElementById('touch-controls').style.display = 'none';
       }
     </script>
     <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
   </body>
 </html>
-
-```
