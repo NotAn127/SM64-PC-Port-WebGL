@@ -234,3 +234,50 @@ a {
 .action-c-d { bottom: 50px; right: 120px; width: 40px; height: 40px; background-position: -50px -220px; }
 .action-c-l { bottom: 90px; right: 160px; width: 40px; height: 40px; background-position: -100px -220px; }
 .action-c-r { bottom: 90px; right: 80px; width: 40px; height: 40px; background-position: -150px -220px; }
+
+/* Styling for the Edit and Reset icons */
+.layout-icon {
+    position: absolute;
+    z-index: 9999;
+    width: 45px;
+    height: 45px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    color: white;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent; 
+}
+
+/* Pin them to the top right of the screen */
+#edit-layout-btn {
+    top: 20px;
+    right: 20px;
+}
+
+#reset-layout-btn {
+    top: 20px;
+    right: 75px; /* Sits exactly to the left of the pencil */
+}
+
+/* Dragging visuals for your game controls */
+.touch-button {
+    touch-action: none; /* Prevents screen scrolling on mobile while dragging */
+    position: absolute;
+}
+
+/* What the buttons look like while Edit Mode is active */
+body.edit-mode-active .touch-button {
+    border: 2px dashed rgba(255, 255, 255, 0.8) !important;
+    background-color: rgba(255, 255, 255, 0.4) !important;
+    cursor: grab;
+}
+
+body.edit-mode-active .touch-button:active {
+    cursor: grabbing;
+}
