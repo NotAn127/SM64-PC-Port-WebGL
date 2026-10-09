@@ -86,10 +86,22 @@
         },
         canvas: (function() {
           var canvas = document.getElementById('canvas');
+          
+          // Force explicit pixel dimensions for mobile WebGL compatibility
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          
+          // Auto-resize if the user rotates their phone
+          window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+          }, false);
+
           canvas.addEventListener("webglcontextlost", function(e) {
             alert('WebGL context lost. Please reload the page.');
             e.preventDefault();
           }, false);
+          
           return canvas;
         })(),
         setStatus: function(text) {}
@@ -216,3 +228,157 @@
         // Action Buttons (Touch + Mouse Support)
         var buttons = document.querySelectorAll('.t-btn');
         buttons.forEach(function(btn) {
+          var key = btn.getAttribute('data-key');
+          
+          function pressKey(e) { 
+            e.preventDefault(); 
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true })); 
+          }
+          function releaseKey(e) { 
+            e.preventDefault(); 
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true })); 
+          }
+
+          btn.addEventListener('touchstart', pressKey, { passive: false });
+          btn.addEventListener('touchend', releaseKey);
+          btn.addEventListener('mousedown', pressKey);
+          btn.addEventListener('mouseup', releaseKey);
+          btn.addEventListener('mouseleave', releaseKey);
+        });
+
+        // Joystick Event Listeners
+        joystickBase = document.getElementById('joystick-base');
+        joystickKnob = document.getElementById('joystick-knob');
+
+        function startDrag(e) {
+          e.preventDefault();
+          isDraggingJoystick = true;
+          // Determine if input is touch or mouse
+          var clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+          var clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+          if (e.changedTouches) joystickPointerId = e.changedTouches[0].identifier;
+          
+          updateJoystick(clientX, clientY);
+        }
+
+        function moveDrag(e) {
+          if (!isDraggingJoystick) return;
+          e.preventDefault();
+          
+          var clientX = e.clientX;
+          var clientY = e.clientY;
+          
+          // Handle multi-touch arrays if mobile
+          if (e.changedTouches) {
+            var touch = Array.from(e.touches).find(t => t.identifier === joystickPointerId);
+            if (!touch) return;
+            clientX = touch.clientX;
+            clientY = touch.clientY;
+          }
+          
+          updateJoystick(clientX, clientY);
+        }
+
+        function endDrag(e) {
+          if (!isDraggingJoystick) return;
+          
+          if (e.changedTouches) {
+            var ended = Array.from(e.changedTouches).find(t => t.identifier === joystickPointerId);
+            if (!ended) return; // Only stop if the specific joystick finger was lifted
+          }
+          
+          isDraggingJoystick = false;
+          joystickPointerId = null;
+          joystickKnob.style.transform = 'translate(0px, 0px)';
+          
+          // Release any active simulated directional keys
+          for (var key in joystickKeys) {
+            if (joystickKeys[key]) {
+              window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+              joystickKeys[key] = false;
+            }
+          }
+        }
+
+        // Bind Touch Events
+        joystickBase.addEventListener('touchstart', startDrag, { passive: false });
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('touchcancel', endDrag);
+        
+        // Bind Mouse Events (For PC Testing)
+        joystickBase.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('mouseup', endDrag);
+
+        touchControlsSetup = true;
+      }
+
+      function updateJoystick(clientX, clientY) {
+        var rect = joystickBase.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height / 2;
+        
+        var dx = clientX - centerX;
+        var dy = clientY - centerY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var maxRadius = rect.width / 2;
+
+        // Clamp the knob inside the base circle
+        if (distance > maxRadius) {
+          dx = (dx / distance) * maxRadius;
+          dy = (dy / distance) * maxRadius;
+          distance = maxRadius;
+        }
+
+        joystickKnob.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+
+        var deadzone = 12;
+        var keysToPress = { 'KeyW': false, 'KeyS': false, 'KeyA': false, 'KeyD': false };
+
+        // Parse visual direction into keyboard inputs
+        if (distance > deadzone) {
+          var ndx = dx / distance;
+          var ndy = dy / distance;
+
+          if (ndx > 0.38) keysToPress['KeyD'] = true; // Right
+          if (ndx < -0.38) keysToPress['KeyA'] = true; // Left
+          if (ndy > 0.38) keysToPress['KeyS'] = true; // Down 
+          if (ndy < -0.38) keysToPress['KeyW'] = true; // Up 
+        }
+
+        for (var key in keysToPress) {
+          if (keysToPress[key] && !joystickKeys[key]) {
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
+            joystickKeys[key] = true;
+          } else if (!keysToPress[key] && joystickKeys[key]) {
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+            joystickKeys[key] = false;
+          }
+        }
+      }
+
+      function toggleTouchControls() {
+        var touchDiv = document.getElementById('touch-controls');
+        if (touchDiv.style.display === 'none' || touchDiv.style.display === '') {
+          touchDiv.style.display = 'block';
+          setupTouchControls();
+        } else {
+          touchDiv.style.display = 'none';
+        }
+      }
+
+      var isMobileOS = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobileOS) {
+        document.getElementById('touch-controls').style.display = 'block';
+        setupTouchControls();
+      } else {
+        document.getElementById('touch-controls').style.display = 'none';
+      }
+    </script>
+    <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
+  </body>
+</html>
+
+```
