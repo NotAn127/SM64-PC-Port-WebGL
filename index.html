@@ -3,7 +3,401 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Super Mario 64 PC Web!Here is the complete, finalized `index.html` file that pairs with your new sprite sheet setup. All the text inside the button tags has been removed so the graphics from your `buttons.png` image display perfectly without overlapping letters.
+
+Replace the contents of your `index.html` file with this code:
+
+```html
+<!doctype html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Super Mario 64 PC Web!</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  </head>
+  <body>
+
+    <!-- Target the entire game-container for Fullscreen to protect overlays -->
+    <div id="game-container">
+      
+      <!-- Canvas Display -->
+      <canvas class="emscripten" id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+
+      <!-- Floating Top Toolbar -->
+      <div id="toolbar">
+        <button id="btn-fullscreen" onclick="toggleFullscreen()">fullscreen</button>
+        <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
+        <button id="btn-export-save" onclick="exportSave()">backup save</button>
+        <button id="btn-import-save" onclick="document.getElementById('file-input').click()">load save</button>
+        <button id="btn-touch" onclick="toggleTouchControls()">toggle touch</button>
+        <input type="file" id="file-input" style="display:none;" onchange="importSave(event)" accept=".bin">
+      </div>
+
+      <!-- Instructions Overlay Modal -->
+      <div id="controls-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-btn" onclick="toggleInstructions()">&times;</span>
+          <img src="images/SuperMario64.png" alt="Super Mario 64" class="header-logo">
+          
+          <div class="instructions-grid">
+            <div class="instruction-box">
+              <h3>Keyboard Controls</h3>
+              <ul>
+                <li><strong>Move:</strong> WASD</li>
+                <li><strong>A (Jump):</strong> L</li>
+                <li><strong>B (Attack):</strong> ,</li>
+                <li><strong>Z (Crouch):</strong> K</li>
+                <li><strong>R (Camera):</strong> Shift</li>
+                <li><strong>Start:</strong> Space</li>
+                <li><strong>C-Buttons:</strong> Arrow Keys</li>
+              </ul>
+            </div>
+            <div class="instruction-box">
+              <h3>Features & Info</h3>
+              <p>Gamepad support is enabled automatically upon plugging in a controller.</p>
+              <p>Save games persist in your browser storage automatically.</p>
+              <p><a href="https://notan127.github.io/SM64-PC-Port-WebGL/classic/" target="_blank">Switch to Classic Port</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Image-based Touch Controls -->
+      <div id="touch-controls">
+        
+        <div id="joystick-container">
+          <div id="joystick-base">
+            <div id="joystick-knob"></div>
+          </div>
+        </div>
+
+        <div id="touch-actions">
+          <!-- R & Start Buttons -->
+          <button class="t-btn action-r" data-key="ShiftLeft"></button>
+          <button class="t-btn action-start" data-key="Space"></button>
+
+          <!-- C-Buttons -->
+          <button class="t-btn action-c-u" data-key="ArrowUp"></button>
+          <button class="t-btn action-c-d" data-key="ArrowDown"></button>
+          <button class="t-btn action-c-l" data-key="ArrowLeft"></button>
+          <button class="t-btn action-c-r" data-key="ArrowRight"></button>
+
+          <!-- Standard Action Face Buttons -->
+          <button class="t-btn action-a" data-key="KeyL"></button>
+          <button class="t-btn action-b" data-key="Comma"></button>
+          <button class="t-btn action-z" data-key="KeyK"></button>
+        </div>
+      </div>
+
+    </div>
+
+    <script type='text/javascript'>
+      var Module = {
+        preRun: [],
+        postRun: [],
+        print: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.log(text);
+        },
+        printErr: function(text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          console.error(text);
+        },
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+          
+          // Force explicit pixel dimensions for mobile WebGL compatibility
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          
+          // Auto-resize if the user rotates their phone
+          window.addEventListener('resize', function() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+          }, false);
+
+          canvas.addEventListener("webglcontextlost", function(e) {
+            alert('WebGL context lost. Please reload the page.');
+            e.preventDefault();
+          }, false);
+          
+          return canvas;
+        })(),
+        setStatus: function(text) {}
+      };
+
+      // Toggles the entire game-container so overlays stay visible in Fullscreen
+      function toggleFullscreen() {
+        var container = document.getElementById('game-container');
+        if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+          if (container.requestFullscreen) {
+            container.requestFullscreen();
+          } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+          }
+        } else {
+          if (document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          }
+        }
+      }
+
+      function toggleInstructions() {
+        var modal = document.getElementById('controls-modal');
+        modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+      }
+
+      // Upgraded Save Data Management
+      function getFS() {
+        if (typeof FS !== 'undefined') return FS;
+        if (typeof Module !== 'undefined' && Module.FS) return Module.FS;
+        return null;
+      }
+
+      var commonSavePaths = [
+        '/sm64_save_file.bin',
+        '/home/web_user/sm64_save_file.bin',
+        '/offline/sm64_save_file.bin',
+        '/data/sm64_save_file.bin'
+      ];
+
+      function exportSave() {
+        var fileSystem = getFS();
+        if (!fileSystem) {
+          alert("The game has not fully loaded yet or the file system is inaccessible.");
+          return;
+        }
+
+        var saveFound = false;
+
+        for (var i = 0; i < commonSavePaths.length; i++) {
+          try {
+            var saveArray = fileSystem.readFile(commonSavePaths[i]);
+            var blob = new Blob([saveArray], { type: 'application/octet-stream' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'sm64_save_file.bin';
+            link.click();
+            
+            localStorage.setItem('sm64_save_path', commonSavePaths[i]);
+            saveFound = true;
+            break; 
+          } catch (err) {
+            // Continues through array list paths
+          }
+        }
+
+        if (!saveFound) {
+          alert("Save file not found! You must collect at least one Star in the game before it generates a save file to backup.");
+        }
+      }
+
+      function importSave(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+
+        var fileSystem = getFS();
+        if (!fileSystem) {
+          alert("The game has not fully loaded yet.");
+          return;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var data = new Uint8Array(e.target.result);
+          var knownPath = localStorage.getItem('sm64_save_path');
+          
+          try {
+            if (knownPath) {
+              fileSystem.writeFile(knownPath, data);
+            } else {
+              for (var i = 0; i < commonSavePaths.length; i++) {
+                try {
+                  var parts = commonSavePaths[i].split('/');
+                  var dir = '';
+                  for (var j = 1; j < parts.length - 1; j++) {
+                    dir += '/' + parts[j];
+                    try { fileSystem.mkdir(dir); } catch(e) {}
+                  }
+                  fileSystem.writeFile(commonSavePaths[i], data);
+                } catch(e) {}
+              }
+            }
+            alert("Save imported successfully! Reload the webpage to load your save.");
+          } catch (err) {
+            alert("Error importing save: " + err.message);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+
+      // Mobile Touch & Mouse Joystick Synthetic Events Handler
+      var touchControlsSetup = false;
+      var joystickBase = null;
+      var joystickKnob = null;
+      var isDraggingJoystick = false;
+      var joystickPointerId = null;
+      var joystickKeys = { 'KeyW': false, 'KeyS': false, 'KeyA': false, 'KeyD': false };
+
+      function setupTouchControls() {
+        if (touchControlsSetup) return;
+
+        // Action Buttons (Touch + Mouse Support)
+        var buttons = document.querySelectorAll('.t-btn');
+        buttons.forEach(function(btn) {
+          var key = btn.getAttribute('data-key');
+          
+          function pressKey(e) { 
+            e.preventDefault(); 
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true })); 
+          }
+          function releaseKey(e) { 
+            e.preventDefault(); 
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true })); 
+          }
+
+          btn.addEventListener('touchstart', pressKey, { passive: false });
+          btn.addEventListener('touchend', releaseKey);
+          btn.addEventListener('mousedown', pressKey);
+          btn.addEventListener('mouseup', releaseKey);
+          btn.addEventListener('mouseleave', releaseKey);
+        });
+
+        // Joystick Event Listeners
+        joystickBase = document.getElementById('joystick-base');
+        joystickKnob = document.getElementById('joystick-knob');
+
+        function startDrag(e) {
+          e.preventDefault();
+          isDraggingJoystick = true;
+          var clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+          var clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
+          if (e.changedTouches) joystickPointerId = e.changedTouches[0].identifier;
+          
+          updateJoystick(clientX, clientY);
+        }
+
+        function moveDrag(e) {
+          if (!isDraggingJoystick) return;
+          e.preventDefault();
+          
+          var clientX = e.clientX;
+          var clientY = e.clientY;
+          
+          if (e.changedTouches) {
+            var touch = Array.from(e.touches).find(t => t.identifier === joystickPointerId);
+            if (!touch) return;
+            clientX = touch.clientX;
+            clientY = touch.clientY;
+          }
+          
+          updateJoystick(clientX, clientY);
+        }
+
+        function endDrag(e) {
+          if (!isDraggingJoystick) return;
+          
+          if (e.changedTouches) {
+            var ended = Array.from(e.changedTouches).find(t => t.identifier === joystickPointerId);
+            if (!ended) return; 
+          }
+          
+          isDraggingJoystick = false;
+          joystickPointerId = null;
+          joystickKnob.style.transform = 'translate(0px, 0px)';
+          
+          for (var key in joystickKeys) {
+            if (joystickKeys[key]) {
+              window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+              joystickKeys[key] = false;
+            }
+          }
+        }
+
+        // Bind Touch Events
+        joystickBase.addEventListener('touchstart', startDrag, { passive: false });
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+        document.addEventListener('touchend', endDrag);
+        document.addEventListener('touchcancel', endDrag);
+        
+        // Bind Mouse Events (For PC Testing)
+        joystickBase.addEventListener('mousedown', startDrag);
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('mouseup', endDrag);
+
+        touchControlsSetup = true;
+      }
+
+      function updateJoystick(clientX, clientY) {
+        var rect = joystickBase.getBoundingClientRect();
+        var centerX = rect.left + rect.width / 2;
+        var centerY = rect.top + rect.height / 2;
+        
+        var dx = clientX - centerX;
+        var dy = clientY - centerY;
+        var distance = Math.sqrt(dx * dx + dy * dy);
+        var maxRadius = rect.width / 2;
+
+        if (distance > maxRadius) {
+          dx = (dx / distance) * maxRadius;
+          dy = (dy / distance) * maxRadius;
+          distance = maxRadius;
+        }
+
+        joystickKnob.style.transform = 'translate(' + dx + 'px, ' + dy + 'px)';
+
+        var deadzone = 12;
+        var keysToPress = { 'KeyW': false, 'KeyS': false, 'KeyA': false, 'KeyD': false };
+
+        if (distance > deadzone) {
+          var ndx = dx / distance;
+          var ndy = dy / distance;
+
+          if (ndx > 0.38) keysToPress['KeyD'] = true; 
+          if (ndx < -0.38) keysToPress['KeyA'] = true; 
+          if (ndy > 0.38) keysToPress['KeyS'] = true; 
+          if (ndy < -0.38) keysToPress['KeyW'] = true; 
+        }
+
+        for (var key in keysToPress) {
+          if (keysToPress[key] && !joystickKeys[key]) {
+            window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
+            joystickKeys[key] = true;
+          } else if (!keysToPress[key] && joystickKeys[key]) {
+            window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
+            joystickKeys[key] = false;
+          }
+        }
+      }
+
+      function toggleTouchControls() {
+        var touchDiv = document.getElementById('touch-controls');
+        if (touchDiv.style.display === 'none' || touchDiv.style.display === '') {
+          touchDiv.style.display = 'block';
+          setupTouchControls();
+        } else {
+          touchDiv.style.display = 'none';
+        }
+      }
+
+      var isMobileOS = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobileOS) {
+        document.getElementById('touch-controls').style.display = 'block';
+        setupTouchControls();
+      } else {
+        document.getElementById('touch-controls').style.display = 'none';
+      }
+    </script>
+    <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
+  </body>
+</html>
+
+```</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   </head>
