@@ -9,7 +9,7 @@ Nintendo please don't sue me😬
 
 Enjoy it while you can, probably lmao
 
-This one has more features than the dodo websites you see from other people, 
+This one has more features than the dodo websites you see from other people, it also has mobile support with touch controls
 
 I got the source from this guy
 https://augustberchelmann.com/mario/
