@@ -91,6 +91,12 @@
 const controls = document.querySelectorAll('.touch-button');
 let isEditMode = false;
 
+function vibrateTouchControls() {
+    if (!isEditMode && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(15);
+    }
+}
+
 const editBtn = document.getElementById('edit-layout-btn');
 const resetBtn = document.getElementById('reset-layout-btn');
 
@@ -127,9 +133,6 @@ let startX, startY, initialX, initialY;
 
 controls.forEach(control => {
     control.addEventListener('pointerdown', (e) => {
-        if (!isEditMode && typeof navigator.vibrate === 'function') {
-            navigator.vibrate(15);
-        }
         if (!isEditMode) return;
 
         activeControl = control;
@@ -336,6 +339,7 @@ loadLayout();
           function pressKey(e) {
             e.preventDefault();
             if (isEditMode) return;
+            if (e.type === 'touchstart') vibrateTouchControls();
             window.dispatchEvent(new KeyboardEvent('keydown', { code: key, bubbles: true }));
           }
           function releaseKey(e) {
@@ -358,6 +362,7 @@ loadLayout();
         function startDrag(e) {
           e.preventDefault();
           if (isEditMode) return;
+          if (e.changedTouches) vibrateTouchControls();
           isDraggingJoystick = true;
           var clientX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
           var clientY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
