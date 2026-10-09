@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en-us">
   <head>
@@ -12,10 +13,10 @@
     <!-- Floating Top Toolbar -->
     <div id="toolbar">
       <button id="btn-fullscreen" onclick="toggleFullscreen()">fullscreen</button>
-      <button id="btn-touch" onclick="toggleTouchControls()">toggle touch</button>
       <button id="btn-instructions" onclick="toggleInstructions()">controls</button>
       <button id="btn-export-save" onclick="exportSave()">backup save</button>
       <button id="btn-import-save" onclick="document.getElementById('file-input').click()">load save</button>
+      <button id="btn-touch" onclick="toggleTouchControls()">toggle touch</button>
       <input type="file" id="file-input" style="display:none;" onchange="importSave(event)" accept=".bin">
     </div>
 
@@ -108,34 +109,101 @@
         modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
       }
 
-      // Save Data Management via Emscripten Virtual File System
+      // Upgraded Save Data Management
+      function getFS() {
+        if (typeof FS !== 'undefined') return FS;
+        if (typeof Module !== 'undefined' && Module.FS) return Module.FS;
+        return null;
+      }
+
+      var commonSavePaths = [
+        '/sm64_save_file.bin',
+        '/home/web_user/sm64_save_file.bin',
+        '/offline/sm64_save_file.bin',
+        '/data/sm64_save_file.bin'
+      ];
+
       function exportSave() {
-        try {
-          var saveArray = FS.readFile('/sm64_save_file.bin');
-          var blob = new Blob([saveArray], { type: 'application/octet-stream' });
-          var link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = 'sm64_save_file.bin';
-          link.click();
-        } catch (err) {
-          alert("Save file not found or game has not generated one yet!");
+        var fileSystem = getFS();
+        if (!fileSystem) {
+          alert("The game has not fully loaded yet or the file system is inaccessible.");
+          return;
+        }
+
+        var saveFound = false;
+
+        for (var i = 0; i < commonSavePaths.length; i++) {
+          try {
+            var saveArray = fileSystem.readFile(commonSavePaths[i]);
+            var blob = new Blob([saveArray], { type: 'application/octet-stream' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'sm64_save_file.bin';
+            link.click();
+            
+            // Remember where we found it so we can import it to the exact same spot later
+            localStorage.setItem('sm64_save_path', commonSavePaths[i]);
+            saveFound = true;
+            break; 
+          } catch (err) {
+            // File not in this specific path, continue checking the next one
+          }
+        }
+
+        if (!saveFound) {
+          alert("Save file not found! You must collect at least one Star in the game before it generates a save file to backup.");
         }
       }
 
       function importSave(event) {
         var file = event.target.files[0];
         if (!file) return;
+
+        var fileSystem = getFS();
+        if (!fileSystem) {
+          alert("The game has not fully loaded yet.");
+          return;
+        }
+
         var reader = new FileReader();
         reader.onload = function(e) {
           var data = new Uint8Array(e.target.result);
-          FS.writeFile('/sm64_save_file.bin', data);
-          alert("Save imported successfully! Reload the page to load your save.");
+          
+          // Try to load it to the last known working path, otherwise write to all common paths to be safe
+          var knownPath = localStorage.getItem('sm64_save_path');
+          
+          try {
+            if (knownPath) {
+              fileSystem.writeFile(knownPath, data);
+            } else {
+              // If we don't know the path, write to all possible locations
+              for (var i = 0; i < commonSavePaths.length; i++) {
+                try {
+                  // Ensure directories exist before writing
+                  var parts = commonSavePaths[i].split('/');
+                  var dir = '';
+                  for (var j = 1; j < parts.length - 1; j++) {
+                    dir += '/' + parts[j];
+                    try { fileSystem.mkdir(dir); } catch(e) {}
+                  }
+                  fileSystem.writeFile(commonSavePaths[i], data);
+                } catch(e) {}
+              }
+            }
+            alert("Save imported successfully! Reload the webpage to load your save.");
+          } catch (err) {
+            alert("Error importing save: " + err.message);
+          }
         };
         reader.readAsArrayBuffer(file);
       }
 
       // Mobile Touch Synthetic Events Handler
+      var touchButtonsSetup = false;
+
       function setupTouchButtons() {
+        if (touchButtonsSetup) return; // Prevent setting up multiple times
+        
         var buttons = document.querySelectorAll('.t-btn');
         buttons.forEach(function(btn) {
           var key = btn.getAttribute('data-key');
@@ -150,13 +218,32 @@
             window.dispatchEvent(new KeyboardEvent('keyup', { code: key, bubbles: true }));
           });
         });
+        touchButtonsSetup = true;
       }
 
-      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+      function toggleTouchControls() {
+        var touchDiv = document.getElementById('touch-controls');
+        if (touchDiv.style.display === 'none' || touchDiv.style.display === '') {
+          touchDiv.style.display = 'block';
+          setupTouchButtons();
+        } else {
+          touchDiv.style.display = 'none';
+        }
+      }
+
+      // Only auto-show on actual mobile OS, not just any touchscreen (like a Windows laptop)
+      var isMobileOS = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobileOS) {
         document.getElementById('touch-controls').style.display = 'block';
         setupTouchButtons();
+      } else {
+        // Ensure it starts hidden on desktop
+        document.getElementById('touch-controls').style.display = 'none';
       }
     </script>
     <script async type="text/javascript" src="game/sm64.us.f3dex2e.js"></script>
   </body>
 </html>
+
+```
